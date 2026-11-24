@@ -3,8 +3,8 @@
 use crate::base::text::has_words;
 use crate::base::time::{MILLIS_PER_SECOND, SECONDS_PER_HOUR};
 use crate::domain::settings::Settings;
-use crate::openai::models::{Task, Thinking};
-use crate::openai::summary;
+use crate::mistral::models::{Task, Thinking};
+use crate::mistral::summary;
 use crate::signal::address::ServiceId;
 use crate::signal::conversation::Entry;
 use alloc::collections::VecDeque;
@@ -225,7 +225,7 @@ mod tests {
 
     #[test]
     fn limits_from_settings() {
-        use crate::openai::models::{Effort, Model};
+        use crate::mistral::models::{Effort, Model};
         assert_eq!(
             Limits::from(&Settings::parse(
                 "auto_replies 50\nauto_gap 120\nauto_hourly 10\nmodel auto gpt-6.1-terra medium\n"

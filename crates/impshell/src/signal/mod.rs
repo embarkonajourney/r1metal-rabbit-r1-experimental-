@@ -15,7 +15,7 @@ pub use drafts::Drafts;
 use crate::clock;
 use crate::crypto::Library;
 use crate::log;
-use crate::openai::Account;
+use crate::mistral::Account;
 use crate::power::alarm::Alarm;
 use crate::storage::Data;
 use crate::storage::settings::Uses;

@@ -7,7 +7,7 @@ use crate::domain::cause::Cause;
 use crate::domain::scribe::Entry;
 use crate::domain::shelf::Shelf;
 use crate::domain::tally::Tally;
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 use crate::storage::SaveFault;
 use alloc::string::String;
 use alloc::vec::Vec;

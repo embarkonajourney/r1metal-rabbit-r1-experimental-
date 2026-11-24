@@ -8,20 +8,19 @@ use crate::base::json::text_at;
 use crate::base::json::unescape;
 use crate::codec::aac;
 use crate::codec::form::Form;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 
-const MICROS_PER_MINUTE: u64 = 4500;
+const MICROS_PER_MINUTE: u64 = 3000;
 pub(crate) const MAX_BYTES: u64 = 25_000_000;
 const MIN_SAMPLES: usize = aac::RATE as usize / 10;
 const FILE_NAME: &str = "note.m4a";
 const FILE_KIND: &str = "audio/mp4";
 const FORM_SLACK: usize = 512;
-const DURATION: &str = "duration";
-const DELTA: &str = "transcript.text.delta";
-const DONE: &str = "transcript.text.done";
+const DELTA: &str = "transcription.text.delta";
+const DONE: &str = "transcription.done";
 
 /// What a recording written down is of.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -76,11 +75,11 @@ pub fn recording_seconds(packets: usize) -> Option<u64> {
         .then(|| aac::seconds(packets, aac::DELAY, aac::RATE))
 }
 
-/// The request's body: a form with the model, the prompt where there is one, and the recording, an MP4 file of AAC sound; for an answer that streams where `is_streamed`.
+/// The request's body: a form with the model, the terms the model is told to spell right where there are ones, and the recording, an MP4 file of AAC sound; for an answer that streams where `is_streamed`.
 pub fn request_form(boundary: &str, recording: &[u8], prompt: &str, is_streamed: bool) -> Vec<u8> {
     let form = Form::new(boundary, recording.len() + prompt.len() + FORM_SLACK).text("model", MODEL);
     let form = if is_streamed { form.text("stream", "true") } else { form };
-    let form = if prompt.trim().is_empty() { form } else { form.text("prompt", prompt.trim()) };
+    let form = if prompt.trim().is_empty() { form } else { form.text("context_bias", prompt.trim()) };
     form.file("file", FILE_NAME, FILE_KIND, recording).end()
 }
 
@@ -94,7 +93,7 @@ impl Stream {
     /// Takes the data of an event and returns more of the words to show; their end, or the service's refusal, is stored.
     pub fn take(&mut self, data: &str) -> Option<String> {
         match text_at(data, &["type"]) {
-            Some(DELTA) => return Some(text_at(data, &["delta"]).map(unescape).unwrap_or_default()),
+            Some(DELTA) => return Some(text_at(data, &["text"]).map(unescape).unwrap_or_default()),
             Some(DONE) => self.end = Some(parse_answer(data.as_bytes())),
             _ => {
                 if let Some(refusal) = parse_refusal(data) {
@@ -132,7 +131,7 @@ impl Transcript {
     /// The log line of `bytes` of a recording of `subject` written down in `ms` milliseconds, `paid` seconds paid for.
     pub fn to_log_line(&self, bytes: usize, subject: Subject, ms: u128, paid: u64) -> String {
         format!(
-            "openai: {bytes} bytes of {} written down as {} characters in {ms} ms, {paid} s paid for",
+            "mistral: {bytes} bytes of {} written down as {} characters in {ms} ms, {paid} s paid for",
             subject.to_name(),
             self.words.chars().count()
         )
@@ -155,12 +154,11 @@ impl Error {
     }
 }
 
-/// Parses an answer of the service; a recording in which nothing was said has no words and is an answer all the same.
+/// Parses an answer of the service, its seconds those of the audio the model processed; a recording in which nothing was said has no words and is an answer all the same.
 pub fn parse_answer(body: &[u8]) -> Result<Transcript, Error> {
     let document = parse_document(body).map_err(|refusal| refusal.map_or(Error::NoWords, Error::Refused))?;
     let words = text_at(document, &["text"]).map(unescape).ok_or(Error::NoWords)?;
-    let is_by_duration = text_at(document, &["usage", "type"]) == Some(DURATION);
-    let seconds = parse_whole_seconds(document, &["usage", "seconds"]).filter(|_| is_by_duration);
+    let seconds = parse_whole_seconds(document, &["usage", "prompt_audio_seconds"]);
     Ok(Transcript { words: words.trim().into(), seconds })
 }
 
@@ -173,20 +171,20 @@ pub const fn sound_micros(seconds: u64) -> u64 {
 mod tests {
     use super::*;
     use crate::base::time::SECONDS_PER_MINUTE;
-    use crate::openai::ledger::Paid;
+    use crate::mistral::ledger::Paid;
 
     #[test]
     fn request_form_parts() {
         let body = request_form("XYZ", &[0, 0, 0, 28, b'f', b't', b'y', b'p'], "", false);
         assert!(body.starts_with(
-            b"--XYZ\r\nContent-Disposition: form-data; name=\"model\"\r\n\r\ngpt-transcribe\r\n--XYZ\r\n"
+            b"--XYZ\r\nContent-Disposition: form-data; name=\"model\"\r\n\r\nvoxtral-mini-transcribe-3\r\n--XYZ\r\n"
         ));
         assert!(body.ends_with(
             b"name=\"file\"; filename=\"note.m4a\"\r\nContent-Type: audio/mp4\r\n\r\n\x00\x00\x00\x1Cftyp\r\n--XYZ--\r\n"
         ));
         let text = String::from_utf8_lossy(&request_form("XYZ", b"m4a", " Pikachu ", false)).into_owned();
         assert!(
-            text.contains("name=\"prompt\"\r\n\r\nPikachu\r\n") && !text.contains("stream"),
+            text.contains("name=\"context_bias\"\r\n\r\nPikachu\r\n") && !text.contains("stream"),
             "what the model is told, without the words streamed: {text}"
         );
         assert_eq!(
@@ -199,13 +197,13 @@ mod tests {
 
     #[test]
     fn answers() {
-        let body = br#"{"text": " Bonjour, \"pouvez\"-vous m'entendre ?\n", "languages": [{"code": "fr"}], "usage": {"type": "duration", "seconds": 27}}"#;
+        let body = br#"{"text": " Bonjour, \"pouvez\"-vous m'entendre ?\n", "language": null, "usage": {"prompt_audio_seconds": 27}}"#;
         assert_eq!(
             parse_answer(body),
             Ok(Transcript { words: "Bonjour, \"pouvez\"-vous m'entendre ?".into(), seconds: Some(27) }),
             "without the escapes of the answer and the blanks about them"
         );
-        let parts = br#"{"text": "Kaese", "usage": {"type": "duration", "seconds": 27.25}}"#;
+        let parts = br#"{"text": "Kaese", "usage": {"prompt_audio_seconds": 27.25}}"#;
         assert_eq!(parse_answer(parts).map(|transcript| transcript.seconds), Ok(Some(28)), "a second begun is counted");
         assert_eq!(
             parse_answer(parts).map(|transcript| transcript.paid_seconds(30)),
@@ -213,11 +211,11 @@ mod tests {
             "and paid for in place of those recorded"
         );
         let tokens =
-            br#"{"text": "x", "usage": {"type": "tokens", "input_tokens": 14, "seconds": 3, "output_tokens": 2}}"#;
+            br#"{"text": "x", "usage": {"prompt_tokens": 14, "total_tokens": 16}}"#;
         assert_eq!(
             parse_answer(tokens),
             Ok(Transcript { words: "x".into(), seconds: None }),
-            "a service that counts tokens tells no seconds"
+            "a service that tells no seconds of the audio tells none"
         );
         assert_eq!(
             parse_answer(tokens).map(|transcript| transcript.paid_seconds(30)),
@@ -253,14 +251,14 @@ mod tests {
         let text = String::from_utf8_lossy(&body);
         assert!(
             text.contains("name=\"stream\"\r\n\r\ntrue\r\n")
-                && text.contains("name=\"prompt\"\r\n\r\nAnna, Pixel\r\n")
+                && text.contains("name=\"context_bias\"\r\n\r\nAnna, Pixel\r\n")
                 && text.ends_with("filename=\"note.m4a\"\r\nContent-Type: audio/mp4\r\n\r\nm4a\r\n--XYZ--\r\n"),
             "{text}"
         );
-        assert!(!String::from_utf8_lossy(&request_form("XYZ", b"x", "  ", true)).contains("prompt"), "nothing to tell");
+        assert!(!String::from_utf8_lossy(&request_form("XYZ", b"x", "  ", true)).contains("context_bias"), "nothing to tell");
         let mut stream = Stream::default();
         assert_eq!(
-            stream.take(r#"{"type":"transcript.text.delta","delta":"Wie \"wird\""}"#).as_deref(),
+            stream.take(r#"{"type":"transcription.text.delta","text":"Wie \"wird\""}"#).as_deref(),
             Some("Wie \"wird\"")
         );
         assert_eq!(
@@ -268,7 +266,7 @@ mod tests {
             (None, None, false),
             "what tells nothing is passed over"
         );
-        let done = r#"{"type":"transcript.text.done","text":"Wie wird das Wetter?","usage":{"type":"duration","seconds":3.2}}"#;
+        let done = r#"{"type":"transcription.done","text":"Wie wird das Wetter?","usage":{"prompt_audio_seconds":3.2}}"#;
         assert_eq!(stream.take(done), None);
         assert!(stream.has_end());
         assert_eq!(
@@ -297,10 +295,10 @@ mod tests {
         assert_eq!(
             names,
             [
-                "openai: 900 bytes of the conversation's sound written down as 8 characters in 120 ms, 4 s paid for",
-                "openai: 900 bytes of sound written down as 8 characters in 120 ms, 4 s paid for",
-                "openai: 900 bytes of a message said written down as 8 characters in 120 ms, 4 s paid for",
-                "openai: 900 bytes of a name said to the Pokédex written down as 8 characters in 120 ms, 4 s paid for",
+                "mistral: 900 bytes of the conversation's sound written down as 8 characters in 120 ms, 4 s paid for",
+                "mistral: 900 bytes of sound written down as 8 characters in 120 ms, 4 s paid for",
+                "mistral: 900 bytes of a message said written down as 8 characters in 120 ms, 4 s paid for",
+                "mistral: 900 bytes of a name said to the Pokédex written down as 8 characters in 120 ms, 4 s paid for",
             ]
         );
         let booked = |subject: Subject, kind: Kind| {
@@ -333,7 +331,7 @@ mod tests {
 
     #[test]
     fn sound_cost() {
-        assert_eq!((sound_micros(60), sound_micros(1), sound_micros(0), sound_micros(3600)), (4500, 75, 0, 270_000));
+        assert_eq!((sound_micros(60), sound_micros(1), sound_micros(0), sound_micros(3600)), (3000, 50, 0, 180_000));
         assert_eq!(
             sound_micros(u64::MAX),
             u64::MAX / SECONDS_PER_MINUTE,

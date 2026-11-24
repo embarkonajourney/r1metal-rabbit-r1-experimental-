@@ -50,7 +50,7 @@ enum Task {
     ///
     /// Writes the boot image and the overlay to the slot the R1 does not boot from, or with --both to both slots, and reboots into them. What r1metal keeps stays, unless the bootloader has to be unlocked first or --wipe is given: both erase user data.
     ///
-    /// Once the R1 is in fastboot, before it writes anything, it asks for an OpenAI key, checked with OpenAI, unless the R1 runs r1metal and keeps one that nothing erases: neither the unlock nor --wipe; Enter flashes without one.
+    /// Once the R1 is in fastboot, before it writes anything, it asks for an Mistral key, checked with Mistral, unless the R1 runs r1metal and keeps one that nothing erases: neither the unlock nor --wipe; Enter flashes without one.
     Flash {
         /// The boot image [default: out/boot.img of the workspace]
         image: Option<PathBuf>,
@@ -77,7 +77,7 @@ enum Task {
     },
     /// Copy what a running R1 keeps into a file, encrypted under the passphrase of its safe
     ///
-    /// Asks for the passphrase of the R1's safe, which the R1 checks, and copies its photos, videos, notes, translations, news, conversation and memory, settings, networks, OpenAI key and Signal's account and conversations into an age file under that passphrase. What is the device's own stays out: the battery's gauge and usage, the modem's and the SIM's files, the logs and the stamp of its flash. Needs firmware with the debug shell.
+    /// Asks for the passphrase of the R1's safe, which the R1 checks, and copies its photos, videos, notes, translations, news, conversation and memory, settings, networks, Mistral key and Signal's account and conversations into an age file under that passphrase. What is the device's own stays out: the battery's gauge and usage, the modem's and the SIM's files, the logs and the stamp of its flash. Needs firmware with the debug shell.
     Backup {
         /// The file written, in place of one that is there
         file: PathBuf,
@@ -89,9 +89,9 @@ enum Task {
         /// The file `r1 backup` wrote
         file: PathBuf,
     },
-    /// Give a running R1 an OpenAI key, checked with OpenAI first
+    /// Give a running R1 an Mistral key, checked with Mistral first
     Key {
-        /// Show the key as a QR code instead, for the R1's OPENAI KEY window to scan
+        /// Show the key as a QR code instead, for the R1's MISTRAL KEY window to scan
         #[arg(long)]
         qr: bool,
     },

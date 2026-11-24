@@ -1,19 +1,19 @@
-//! A request to OpenAI's services: its address, headers and packed body, the system prompt's modules, and its progress.
+//! A request to Mistral's services: its address, headers and packed body, the system prompt's modules, and its progress.
 
 use crate::codec::http::OK;
 use crate::codec::http::POST;
 use crate::codec::http::Target;
 use crate::codec::http::USER_AGENT;
 use crate::codec::zstd;
-use crate::openai::fault::Fault;
-use crate::openai::models::image::SIDE;
-use crate::openai::sse::EventStream;
+use crate::mistral::fault::Fault;
+use crate::mistral::models::image::SIDE;
+use crate::mistral::sse::EventStream;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 
-const MODULES: &str = include_str!("../../assets/openai/modules.txt");
+const MODULES: &str = include_str!("../../assets/mistral/modules.txt");
 pub const JSON: &str = "application/json";
 pub const EVENTS: &str = "text/event-stream";
 const ZSTD: &str = "zstd";
@@ -93,7 +93,7 @@ pub fn session_headers(bearer: &str) -> [(&'static str, &str); 2] {
     [("User-Agent", USER_AGENT), ("Authorization", bearer)]
 }
 
-/// The body compressed with zstd where it goes to the one address OpenAI takes it at and that makes it smaller, within `MAX_RATIO`.
+/// The body compressed with zstd where it goes to the one address Mistral takes it at and that makes it smaller, within `MAX_RATIO`.
 pub fn compress_body(target: &Target, method: &str, kind: Option<&str>, body: &[u8]) -> Option<Vec<u8>> {
     if method != POST || kind != Some(JSON) || target.path != COMPRESSED_PATH {
         return None;
@@ -184,7 +184,7 @@ mod tests {
 
     #[test]
     fn body_compression() {
-        let target = Target::parse("https://api.openai.com/v1/responses").unwrap();
+        let target = Target::parse("https://api.mistral.ai/v1/responses").unwrap();
         let thread: String = (0..200u32)
             .map(|at| {
                 format!(

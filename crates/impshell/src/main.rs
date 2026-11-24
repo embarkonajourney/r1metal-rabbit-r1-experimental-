@@ -24,7 +24,7 @@ mod media;
 mod memos;
 mod net;
 mod news;
-mod openai;
+mod mistral;
 mod pid1;
 mod pokedex;
 mod pool;

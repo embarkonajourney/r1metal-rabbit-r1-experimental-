@@ -1,5 +1,5 @@
 use super::{Robot, files};
-use crate::openai::write;
+use crate::mistral::write;
 use crate::voiced::Shared;
 use crate::wifi::radio::Hold;
 use crate::{clock, log};

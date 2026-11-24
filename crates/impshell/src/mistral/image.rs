@@ -2,10 +2,10 @@ use super::{Account, boundary};
 use crate::wifi::radio::NetworkDown;
 use r1_funcore::codec::form;
 use r1_funcore::codec::http::POST;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::image;
-use r1_funcore::openai::models::image::ADDRESS;
-use r1_funcore::openai::request::{Step, parse_target};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::image;
+use r1_funcore::mistral::models::image::ADDRESS;
+use r1_funcore::mistral::request::{Step, parse_target};
 
 /// Has the image model redraw a JPEG photo in the stay `down`, telling `on_step` how far the request has got; returns the picture and its cost for the log. Refused where asking again would come to the same at the same price.
 pub fn redraw(
@@ -44,7 +44,7 @@ mod tests {
 
     #[test]
     fn failed_redraw_booked_as_counted() {
-        let account = crate::openai::tests::unusable();
+        let account = crate::mistral::tests::unusable();
         assert_eq!(book_failed(&account, b"{}"), "$0.00 paid", "an answer that counts nothing cost nothing");
         let down = crate::wifi::radio::tests::up();
         assert!(matches!(redraw(&account, &down, b"photo", |_| {}), Err(Fault::Temporary(_))), "nothing without a key");

@@ -1,9 +1,9 @@
 use super::{Account, Session};
 use crate::wifi::radio::NetworkDown;
 use r1_funcore::net::websocket::Kind;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::live::{self, Uplink};
-use r1_funcore::openai::models::interpreter::{ADDRESS, TIMEOUT};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::live::{self, Uplink};
+use r1_funcore::mistral::models::interpreter::{ADDRESS, TIMEOUT};
 use std::io;
 
 /// A translator's session: the microphone's sound up, the live model's voice and words down.
@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn no_key_no_session() {
-        let account = crate::openai::tests::unusable();
+        let account = crate::mistral::tests::unusable();
         assert!(matches!(Interpreter::open(&account, &crate::wifi::radio::tests::up()), Err(Fault::Temporary(_))));
         assert_eq!(
             (book_session(&account, 60), book_session(&account, 0)),

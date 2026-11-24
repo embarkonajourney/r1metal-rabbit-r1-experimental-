@@ -3,7 +3,7 @@
 use crate::domain::cost::Figure;
 use crate::domain::memos::{read_summary, read_words};
 use crate::domain::paper::names::directory;
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 use crate::storage::Files;
 use crate::storage::paths::Listed;
 use alloc::format;
@@ -98,7 +98,7 @@ fn write_cost_lines(lines: &[Figure], depth: usize, text: &mut String) {
     }
 }
 
-/// The cost of OpenAI's services, each page's lines under the line that opens it.
+/// The cost of Mistral's services, each page's lines under the line that opens it.
 pub fn to_cost(lines: &[Figure]) -> String {
     let mut text = String::new();
     write_cost_lines(lines, 0, &mut text);

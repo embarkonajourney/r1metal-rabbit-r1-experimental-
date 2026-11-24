@@ -215,7 +215,7 @@ mod tests {
             ".r1metal/interface/settings",
             ".r1metal/interface",
             ".r1metal/wifi/secret",
-            ".r1metal/openai/key",
+            ".r1metal/mistral/key",
             ".r1metal/battery.old",
         ] {
             assert!(is_backed_up(taken), "{taken}");
@@ -231,7 +231,7 @@ mod tests {
             "chat/core.md.new",
             ".restore/camera/a.jpg",
             ".restore.new",
-            ".r1metal.new/openai/key",
+            ".r1metal.new/mistral/key",
             ".r1metal.key",
             ".r1metal.key2",
             "lost+found",

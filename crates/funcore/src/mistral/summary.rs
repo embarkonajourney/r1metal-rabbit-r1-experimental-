@@ -13,7 +13,7 @@ use crate::base::json::items;
 use crate::base::json::text_at;
 use crate::base::time::NANOS_PER_SECOND;
 use crate::codec::http::Target;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -32,7 +32,7 @@ const RUNDOWNS_REQUEST: &str = "a request for the rundowns read";
 pub const RUNDOWN: (Task, Entry) = (Task::News, Entry::one(Kind::Rundown));
 /// The error text of work a stay ended before it came.
 pub const UNFINISHED: &str = "the stay ended before the model's work came, which is owed to the next asking";
-pub const RESUMED_LINE: &str = "openai: work a stay ended before it came is asked after, not asked for again";
+pub const RESUMED_LINE: &str = "mistral: work a stay ended before it came is asked after, not asked for again";
 
 /// What a piece of background work waited for is of: by it the work is named in the log, takes its use's model, and is booked.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -86,7 +86,7 @@ impl Work {
 /// The log line of a rundown asked for from a report.
 pub fn to_asked_line(topic: &str, report: &str, ms: u128, status: &WorkStatus) -> String {
     format!(
-        "openai: the day's {topic} asked for from {} characters in {ms} ms, {}",
+        "mistral: the day's {topic} asked for from {} characters in {ms} ms, {}",
         report.chars().count(),
         status.to_log_line()
     )
@@ -130,7 +130,7 @@ impl Summary {
     /// The log line of `work` written in `ms` milliseconds, after `polls` polls.
     pub fn to_written_line(&self, work: &str, ms: u128, polls: u32) -> String {
         format!(
-            "openai: {work} in {} characters in {ms} ms, asked after {polls} times, {}",
+            "mistral: {work} in {} characters in {ms} ms, asked after {polls} times, {}",
             self.text.chars().count(),
             self.usage.to_log_line()
         )
@@ -139,7 +139,7 @@ impl Summary {
     /// The log line of a day's rundown of that name, `seconds` after it was asked for.
     pub fn to_rundown_line(&self, topic: &str, seconds: u64) -> String {
         format!(
-            "openai: the day's {topic} written in {} characters, {seconds} s after it was asked for, {}",
+            "mistral: the day's {topic} written in {} characters, {seconds} s after it was asked for, {}",
             self.text.chars().count(),
             self.usage.to_log_line()
         )
@@ -388,7 +388,7 @@ fn search_micros(body: &[u8]) -> u64 {
 mod tests {
     use super::*;
     use crate::base::json::unescape;
-    use crate::openai::models::{Effort, Model};
+    use crate::mistral::models::{Effort, Model};
 
     #[test]
     fn request_body() {
@@ -438,7 +438,7 @@ mod tests {
         assert_eq!(status_of(queued), Ok(WorkStatus::Pending("resp_0a1B-2c_3".into(), Standing::Queued)));
         let in_progress = br#"{"id": "resp_9", "status": "in_progress", "error": null}"#;
         assert_eq!(status_of(in_progress), Ok(WorkStatus::Pending("resp_9".into(), Standing::InProgress)));
-        assert_eq!(poll_address("resp_9").as_deref(), Some("https://api.openai.com/v1/responses/resp_9"));
+        assert_eq!(poll_address("resp_9").as_deref(), Some("https://api.mistral.ai/v1/responses/resp_9"));
         for invalid in ["", "resp 9", "resp/../9", "resp?x=1", "r\u{E4}sp"] {
             assert_eq!(poll_address(invalid), None, "{invalid:?}");
         }
@@ -684,18 +684,18 @@ mod tests {
         let usage = Usage::default().to_log_line();
         assert_eq!(
             written.to_written_line(&Work::Recollection.to_name(""), 900, 3),
-            format!("openai: a day recollected in 5 characters in 900 ms, asked after 3 times, {usage}")
+            format!("mistral: a day recollected in 5 characters in 900 ms, asked after 3 times, {usage}")
         );
         assert_eq!(
             written.to_rundown_line("news", 42),
-            format!("openai: the day's news written in 5 characters, 42 s after it was asked for, {usage}")
+            format!("mistral: the day's news written in 5 characters, 42 s after it was asked for, {usage}")
         );
         assert_eq!(
             [WorkStatus::Pending("resp_9".into(), Standing::Queued), WorkStatus::Done(written)]
                 .map(|status| to_asked_line("news", "abc", 12, &status)),
             [
-                "openai: the day's news asked for from 3 characters in 12 ms, the model works on it",
-                "openai: the day's news asked for from 3 characters in 12 ms, the answer was there at once"
+                "mistral: the day's news asked for from 3 characters in 12 ms, the model works on it",
+                "mistral: the day's news asked for from 3 characters in 12 ms, the answer was there at once"
             ]
         );
     }

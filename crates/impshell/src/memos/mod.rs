@@ -16,7 +16,7 @@ use r1_funcore::domain::memos::{self, FULL_LINE, Lengths, Request};
 use r1_funcore::domain::paper::names::{self, directory, folder};
 use r1_funcore::domain::shelf::Shelf;
 use r1_funcore::domain::tally::Tally;
-use r1_funcore::openai::ledger::SummaryKind;
+use r1_funcore::mistral::ledger::SummaryKind;
 use r1_funcore::storage::paths::Listed;
 use r1_funcore::storage::{NOTES, SaveFault, has_room};
 use std::io;

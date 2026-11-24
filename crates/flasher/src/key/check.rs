@@ -1,27 +1,27 @@
-//! OpenAI's word on a key: the list of the models it may use asked for with it, which costs nothing, its connection and answer bounded in time and length, its name resolved by the host in the host's own time.
+//! Mistral's word on a key: the list of the models it may use asked for with it, which costs nothing, its connection and answer bounded in time and length, its name resolved by the host in the host's own time.
 
 use r1_funcore::codec::http::{self, Framing, Head, READ_BYTES, Target};
 use r1_funcore::net::race::TIMEOUT;
-use r1_funcore::openai::key::{self, Verdict};
-use r1_funcore::openai::models;
-use r1_funcore::openai::request::{JSON, headers};
+use r1_funcore::mistral::key::{self, Verdict};
+use r1_funcore::mistral::models;
+use r1_funcore::mistral::request::{JSON, headers};
 use rustls::pki_types::ServerName;
 use rustls::{ClientConfig, ClientConnection, RootCertStore, StreamOwned};
 use std::io::{self, Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::sync::Arc;
 
-// The most of OpenAI's answer that is read: its head and a refusal lie well within; past it the list of the models is cut, which tells as much.
+// The most of Mistral's answer that is read: its head and a refusal lie well within; past it the list of the models is cut, which tells as much.
 const ANSWER_BYTES: usize = 65536;
 
-// What is no HTTP in OpenAI's answer.
+// What is no HTTP in Mistral's answer.
 fn no_http<T>(_: T) -> io::Error {
-    io::Error::new(io::ErrorKind::InvalidData, "OpenAI's answer is no HTTP")
+    io::Error::new(io::ErrorKind::InvalidData, "Mistral's answer is no HTTP")
 }
 
 // A connection to the first of the server's addresses that takes one in time, which reads and writes in time or fails.
 fn reached(target: &Target) -> io::Result<TcpStream> {
-    let mut failed = io::Error::new(io::ErrorKind::NotFound, "OpenAI's name has no address");
+    let mut failed = io::Error::new(io::ErrorKind::NotFound, "Mistral's name has no address");
     for address in (target.host.as_str(), target.port).to_socket_addrs()? {
         match TcpStream::connect_timeout(&address, TIMEOUT) {
             Ok(tcp) => {
@@ -35,7 +35,7 @@ fn reached(target: &Target) -> io::Result<TcpStream> {
     Err(failed)
 }
 
-// The status and the body of OpenAI's answer to the check of a key.
+// The status and the body of Mistral's answer to the check of a key.
 fn answer(key: &str) -> io::Result<(u16, Vec<u8>)> {
     let target =
         Target::parse(models::check::ADDRESS).ok_or_else(|| io::Error::other("the check's address is no URL"))?;
@@ -69,7 +69,7 @@ fn answer(key: &str) -> io::Result<(u16, Vec<u8>)> {
         }
     }
     let Some(head) = Head::take(&mut received).map_err(no_http)? else {
-        return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "OpenAI closed before it answered"));
+        return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "Mistral closed before it answered"));
     };
     let (mut framing, _) = Framing::from_head(&head, http::GET).map_err(no_http)?;
     let mut body = Vec::new();
@@ -77,20 +77,20 @@ fn answer(key: &str) -> io::Result<(u16, Vec<u8>)> {
     Ok((head.status, body))
 }
 
-// What is wrong with a key as given, as `r1` tells it; none for one OpenAI takes.
+// What is wrong with a key as given, as `r1` tells it; none for one Mistral takes.
 pub(super) fn refused(given: &str) -> Option<String> {
     let Some(key) = key::parse_key(given) else {
-        return Some("that is no OpenAI key: one begins with sk- and holds letters, digits, - and _ alone".into());
+        return Some("that is no Mistral key: one holds thirty-two letters and digits alone".into());
     };
     let (status, verdict) = match answer(key) {
         Ok((status, body)) => (status, key::parse_verdict(status, &body)),
-        Err(e) => return Some(format!("OpenAI could not be asked: {e}")),
+        Err(e) => return Some(format!("Mistral could not be asked: {e}")),
     };
     let told = match verdict {
         Verdict::Works => None,
-        Verdict::Known => Some(format!("OpenAI knows the key, which may not list the models (status {status})")),
-        Verdict::Refused => Some(format!("OpenAI does not know the key (status {status})")),
-        Verdict::Unanswered => Some(format!("OpenAI said nothing of the key (status {status})")),
+        Verdict::Known => Some(format!("Mistral knows the key, which may not list the models (status {status})")),
+        Verdict::Refused => Some(format!("Mistral does not know the key (status {status})")),
+        Verdict::Unanswered => Some(format!("Mistral said nothing of the key (status {status})")),
     };
     // A key the verdict keeps is taken, what is told of it only a note.
     if verdict.should_store() {
@@ -106,8 +106,8 @@ mod tests {
 
     #[test]
     fn malformed_key_refused() {
-        for given in ["", "pk-live-abc", "sk-two words", "sk-"] {
-            assert!(refused(given).is_some_and(|why| why.starts_with("that is no OpenAI key")), "{given:?}");
+        for given in ["", "pk-live-abc", "sk-two words", "sk-", "AbCdEf0123456789"] {
+            assert!(refused(given).is_some_and(|why| why.starts_with("that is no Mistral key")), "{given:?}");
         }
     }
 }

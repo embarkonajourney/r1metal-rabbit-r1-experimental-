@@ -5,10 +5,10 @@ use crate::base::json::number_at;
 use crate::base::json::text_at;
 use crate::base::json::unescape;
 use crate::base::json::value_at;
-use crate::openai::ledger::{Entry, Kind, Ledger};
-use crate::openai::output::{COMPLETED, MESSAGE, SEARCH_CALL, SEARCH_MICROS, output_text, search_count};
-use crate::openai::refusal::{Refusal, parse_refusal};
-use crate::openai::tokens::Usage;
+use crate::mistral::ledger::{Entry, Kind, Ledger};
+use crate::mistral::output::{COMPLETED, MESSAGE, SEARCH_CALL, SEARCH_MICROS, output_text, search_count};
+use crate::mistral::refusal::{Refusal, parse_refusal};
+use crate::mistral::tokens::Usage;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -144,7 +144,7 @@ impl Answer {
     pub fn to_turn_line(&self, start: usize, items: usize, ms: u128) -> String {
         let reason = self.reason.as_deref().map_or_else(String::new, |reason| format!(" for {reason}"));
         format!(
-            "openai: a turn of the conversation answered over its WebSocket, {} of {items} items sent in {ms} ms, {}{reason}, {}, {} searches",
+            "mistral: a turn of the conversation answered over its WebSocket, {} of {items} items sent in {ms} ms, {}{reason}, {}, {} searches",
             items - start,
             self.status,
             self.usage.to_log_line(),
@@ -154,7 +154,7 @@ impl Answer {
 
     pub fn to_failed_line(&self) -> String {
         format!(
-            "openai: a turn of the conversation failed, {}, {} searches",
+            "mistral: a turn of the conversation failed, {}, {} searches",
             self.usage.to_log_line(),
             self.search_count()
         )
@@ -229,7 +229,7 @@ fn response_of(data: &str) -> &str {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::chat::turn::PREVIOUS_NOT_FOUND;
+    use crate::mistral::chat::turn::PREVIOUS_NOT_FOUND;
     use alloc::vec;
 
     #[test]
@@ -372,12 +372,12 @@ mod tests {
             [answer.to_turn_line(2, 5, 1200), incomplete.to_turn_line(0, 1, 9), answer.to_failed_line()],
             [
                 format!(
-                    "openai: a turn of the conversation answered over its WebSocket, 3 of 5 items sent in 1200 ms, completed, {usage}, 2 searches"
+                    "mistral: a turn of the conversation answered over its WebSocket, 3 of 5 items sent in 1200 ms, completed, {usage}, 2 searches"
                 ),
                 format!(
-                    "openai: a turn of the conversation answered over its WebSocket, 1 of 1 items sent in 9 ms, incomplete for max_output_tokens, {cut_usage}, 1 searches"
+                    "mistral: a turn of the conversation answered over its WebSocket, 1 of 1 items sent in 9 ms, incomplete for max_output_tokens, {cut_usage}, 1 searches"
                 ),
-                format!("openai: a turn of the conversation failed, {usage}, 2 searches")
+                format!("mistral: a turn of the conversation failed, {usage}, 2 searches")
             ],
             "the items new to the socket of those the thread holds, how the answer stood and why it was cut, what it cost and searched"
         );
@@ -385,7 +385,7 @@ mod tests {
 
     #[test]
     fn ledger_entries() {
-        use crate::openai::ledger::Paid;
+        use crate::mistral::ledger::Paid;
         let Event::End(End::Done(answer)) = parse_event(DONE) else {
             panic!("the end of an answer");
         };

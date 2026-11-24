@@ -22,10 +22,10 @@ use crate::gfx::theme::Theme;
 use crate::hw::power::battery;
 use crate::hw::power::usage::Usage;
 use crate::logs::{self, Crashes, Logging, lines};
-use crate::openai::chat::request::Location;
-use crate::openai::key;
-use crate::openai::ledger::{self, Ledger};
-use crate::openai::models::Model;
+use crate::mistral::chat::request::Location;
+use crate::mistral::key;
+use crate::mistral::ledger::{self, Ledger};
+use crate::mistral::models::Model;
 use crate::signal::device::{self, Device};
 use crate::storage::safe;
 use crate::wifi::known::Known;
@@ -216,7 +216,7 @@ fn news_round_trip() {
 
 #[test]
 fn ledger_and_key_round_trip() {
-    let file = text("openai/book");
+    let file = text("mistral/book");
     let with_later: String = file.lines().map(|line| std::format!("{line} 0 0 0 0 0 0\n")).collect();
     assert_eq!(
         Ledger::parse(&file).to_text(),
@@ -224,7 +224,7 @@ fn ledger_and_key_round_trip() {
         "what the earlier firmware kept, and behind each month the browser's two kinds and the bell's, which it did not have"
     );
     assert_eq!(Ledger::parse(&with_later).to_text(), with_later);
-    let file = text("openai/key");
+    let file = text("mistral/key");
     assert_eq!(key::parse_file(&file), Some("sk-proj-Fake0Key_-9"));
     assert_eq!(key::to_file_text("sk-proj-Fake0Key_-9"), file);
 }
@@ -304,8 +304,8 @@ fn file_paths_stable() {
         (wifi::DIRECTORY, places::PLACE_FILE, ".r1metal/wifi/place"),
         (place::DIRECTORY, place::OFFSET_FILE, ".r1metal/clock/place"),
         (place::DIRECTORY, place::LOCATION_FILE, ".r1metal/clock/where"),
-        (key::DIRECTORY, key::FILE, ".r1metal/openai/key"),
-        (key::DIRECTORY, ledger::FILE, ".r1metal/openai/ledger"),
+        (key::DIRECTORY, key::FILE, ".r1metal/mistral/key"),
+        (key::DIRECTORY, ledger::FILE, ".r1metal/mistral/ledger"),
         (CHAT_PRIVATE, chat::STATE_FILE, ".r1metal/chat/state"),
         (CHAT_PRIVATE, chat::THREAD_FILE, ".r1metal/chat/thread"),
         (magic::DIRECTORY, &magic::to_waiting_name("20261009_193512"), ".r1metal/magic/20261009_193512.jpg"),

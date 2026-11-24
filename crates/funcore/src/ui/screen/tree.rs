@@ -12,7 +12,7 @@ use crate::domain::settings::{Setting, Tool};
 use crate::domain::shelf::Shelf;
 use crate::domain::uses::Use;
 use crate::gfx::icon::Icon;
-use crate::openai::models::Task;
+use crate::mistral::models::Task;
 use crate::ui::corner::{CELL_ICON, WIFI_ICON};
 use crate::ui::grid::Grid;
 use crate::ui::item::Item;

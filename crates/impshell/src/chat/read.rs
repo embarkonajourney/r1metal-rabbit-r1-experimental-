@@ -1,4 +1,4 @@
-use crate::openai::Account;
+use crate::mistral::Account;
 use crate::storage::Data;
 use crate::{clock, log, sys};
 use r1_funcore::base::time::Moment;
@@ -9,7 +9,7 @@ use r1_funcore::domain::cost::to_figures;
 use r1_funcore::domain::device;
 use r1_funcore::domain::memos;
 use r1_funcore::domain::settings::Settings;
-use r1_funcore::openai::ledger::SummaryKind;
+use r1_funcore::mistral::ledger::SummaryKind;
 use r1_funcore::storage::NEWS;
 use r1_funcore::storage::paths::Listed;
 

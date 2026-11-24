@@ -3,7 +3,7 @@
 use super::state::EditionRequest;
 use crate::domain::cause::Cause;
 use crate::domain::shelf::Shelf;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -141,7 +141,7 @@ pub fn note_anew(text: Option<&str>, day: &str, topic: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::refusal::Refusal;
+    use crate::mistral::refusal::Refusal;
 
     #[test]
     fn wanted_on_news_shelf() {

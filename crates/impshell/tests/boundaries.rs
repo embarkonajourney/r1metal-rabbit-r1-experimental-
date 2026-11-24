@@ -92,7 +92,7 @@ const CORE_LAYERS: [&[&str]; 8] = [
     &["crypto", "gfx", "codec"],
     &["hw", "input", "fs", "net"],
     &["storage"],
-    &["logs", "cell", "openai", "signal"],
+    &["logs", "cell", "mistral", "signal"],
     &["wifi"],
     &["domain"],
     &["ui"],
@@ -111,7 +111,7 @@ const SHELL_LAYERS: [&[&str]; 17] = [
     &["cell"],
     &["wifi"],
     &["net"],
-    &["openai", "timekeeper"],
+    &["mistral", "timekeeper"],
     &["backlog", "voiced"],
     &[
         "about",
@@ -2174,7 +2174,7 @@ fn self_import_is_no_bare_name() {
         "fn edited() -> bool {\n    editor()\n}",
         "fn kept() -> editor::News {\n    editor::News::default()\n}",
         "fn heard() -> bool {\n    told()\n}",
-        "use r1_funcore::openai::key;",
+        "use r1_funcore::mistral::key;",
         "fn key() -> bool {\n    fs::metadata(\"y\").is_ok()\n}",
         "fn keyed() -> bool {\n    key()\n}",
     ];

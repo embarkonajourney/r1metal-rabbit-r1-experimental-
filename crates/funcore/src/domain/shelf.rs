@@ -1,6 +1,6 @@
 //! The kinds of entry the audio, news and memory screens list.
 
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 
 /// A kind of entry.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

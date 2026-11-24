@@ -1,13 +1,13 @@
 use crate::backlog::Worker;
 use crate::log;
-use crate::openai::{self, Account};
+use crate::mistral::{self, Account};
 use crate::storage::Data;
 use crate::sync::Board;
 use crate::sys;
 use r1_funcore::domain::magic::{
     self, DIRECTORY, MAX_PARALLEL, Order, Outcome, Progress, Report, Stage, State, Timings,
 };
-use r1_funcore::openai::fault::Fault;
+use r1_funcore::mistral::fault::Fault;
 use r1_funcore::storage::paths::Listed;
 use std::io;
 use std::os::fd::RawFd;
@@ -52,7 +52,7 @@ impl Shared {
             let down = hold.inspect_err(|fault| log!("{}", magic::to_unheld_line(photo, fault)))?;
             let mut timings = Timings { joined: start.elapsed(), bytes: picture.len(), ..Timings::default() };
             self.set_stage(photo, Stage::Joined);
-            let result = openai::image::redraw(&self.account, &down, &picture, |step| {
+            let result = mistral::image::redraw(&self.account, &down, &picture, |step| {
                 timings.note(step, start.elapsed());
                 self.set_stage(photo, Stage::from(step));
             });

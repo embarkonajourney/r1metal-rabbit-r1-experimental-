@@ -6,11 +6,11 @@ use crate::sys::lock;
 use crate::wifi::radio::NetworkDown;
 use r1_funcore::codec::http::{self, GET, POST, READ_BYTES, Target};
 use r1_funcore::net::tls::Purpose;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::key;
-use r1_funcore::openai::models::TIMEOUT;
-use r1_funcore::openai::refusal::{Refusal, parse_refusal};
-use r1_funcore::openai::request::{Body, EVENTS, JSON, Step, check_length, compress_body, headers, session_headers};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::key;
+use r1_funcore::mistral::models::TIMEOUT;
+use r1_funcore::mistral::refusal::{Refusal, parse_refusal};
+use r1_funcore::mistral::request::{Body, EVENTS, JSON, Step, check_length, compress_body, headers, session_headers};
 use std::io::{self, Read};
 use std::time::Duration;
 
@@ -176,7 +176,7 @@ mod tests {
     use crate::net::served::{Connection, head, listen, serve_answers};
     use crate::wifi::radio::tests::up;
     use r1_funcore::codec::http::USER_AGENT;
-    use r1_funcore::openai::request::{ANSWER_BYTES, TOO_LONG};
+    use r1_funcore::mistral::request::{ANSWER_BYTES, TOO_LONG};
     use std::io::Write;
     use std::sync::mpsc;
     use std::thread;

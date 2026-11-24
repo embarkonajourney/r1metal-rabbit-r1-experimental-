@@ -7,7 +7,7 @@ use crate::base::text::to_one_line;
 use crate::domain::cause::Cause;
 use crate::domain::paper::names::is_name;
 use crate::domain::voice::{Changes, Request, Voice};
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::collections::VecDeque;
 use alloc::format;
 use alloc::string::String;

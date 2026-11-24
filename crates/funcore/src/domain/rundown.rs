@@ -1,7 +1,7 @@
 //! The battery rundown's pings, counts and status, without its socket and thread.
 
 use crate::net::icmp;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use core::net::Ipv4Addr;

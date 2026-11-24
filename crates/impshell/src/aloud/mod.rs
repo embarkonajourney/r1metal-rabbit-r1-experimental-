@@ -1,6 +1,6 @@
 use crate::log;
-use crate::openai::aloud::ReadingSession;
-use crate::openai::{self, Account};
+use crate::mistral::aloud::ReadingSession;
+use crate::mistral::{self, Account};
 use crate::sound::{self, SoundStream};
 use crate::sync::Board;
 use crate::sys::{self, Wake, lock};
@@ -13,7 +13,7 @@ use r1_funcore::domain::aloud::state::{ReadingRequest, Report, State};
 use r1_funcore::domain::aloud::{ReadingSource, Script};
 use r1_funcore::domain::cause::Cause;
 use r1_funcore::domain::voice::Phase;
-use r1_funcore::openai::fault::{self, Fault};
+use r1_funcore::mistral::fault::{self, Fault};
 use std::io;
 use std::mem;
 use std::ops::ControlFlow;
@@ -332,7 +332,7 @@ fn work(shared: &Shared) -> ! {
         log!("{}", source.to_begun_line(round, script.passages.len()));
         let (ending, micros) = run_reading(shared, (round, source), script);
         if let Some(micros) = micros {
-            openai::aloud::book_reading(&shared.account, source.ledger_kind(), micros);
+            mistral::aloud::book_reading(&shared.account, source.ledger_kind(), micros);
         }
         let is_wanted = shared.is_wanted((round, source));
         shared.set_phase((round, source), Phase::from_ending(Cause::from_ending(&ending), is_wanted));
@@ -399,7 +399,7 @@ mod tests {
     use crate::wifi::radio::tests::{up, without_networks};
     use r1_funcore::domain::aloud::Words;
     use r1_funcore::domain::shelf::Shelf;
-    use r1_funcore::openai::aloud::TASK;
+    use r1_funcore::mistral::aloud::TASK;
     use std::thread::{self, JoinHandle};
 
     const CREATED: &str = r#"{"type":"response.created","response":{"id":"resp_9","status":"in_progress"}}"#;

@@ -18,12 +18,12 @@ use crate::wifi::radio::{Hold, NetworkDown, Online};
 use crate::{clock, crypto, log};
 use r1_funcore::base::time::Moment;
 use r1_funcore::codec::form::{self, BOUNDARY_BYTES};
-use r1_funcore::openai::account::{State, Terms};
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::key;
-use r1_funcore::openai::ledger::{self, Ledger};
-use r1_funcore::openai::models::{Task, Thinking};
-use r1_funcore::openai::refusal::Refusal;
+use r1_funcore::mistral::account::{State, Terms};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::key;
+use r1_funcore::mistral::ledger::{self, Ledger};
+use r1_funcore::mistral::models::{Task, Thinking};
+use r1_funcore::mistral::refusal::Refusal;
 use request::Key;
 use std::io;
 use std::sync::{Arc, Condvar, Mutex};
@@ -168,7 +168,7 @@ impl Account {
     fn add(&self, add: impl FnOnce(&mut Ledger, u32, u8) -> bool) {
         let now = Moment::from_seconds(clock::local());
         if let Err(e) = self.change_ledger(|ledger| add(ledger, now.year, now.month)) {
-            log!("openai: the book of what the services were paid: {e}");
+            log!("mistral: the book of what the services were paid: {e}");
         }
     }
 
@@ -189,7 +189,7 @@ impl Account {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use r1_funcore::openai::ledger::{Entry, Kind};
+    use r1_funcore::mistral::ledger::{Entry, Kind};
 
     pub(crate) fn unusable() -> Account {
         Account::new(Data::unusable(), crate::wifi::radio::tests::without_networks().online())

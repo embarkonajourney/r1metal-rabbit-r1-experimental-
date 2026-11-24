@@ -7,7 +7,7 @@ use r1_funcore::codec::http::{GET, Target};
 use r1_funcore::domain::place::{self, ANSWER_BYTES, HEADERS};
 use r1_funcore::net::sntp::{self, MARK_BYTES, SERVERS};
 use r1_funcore::net::tls::Purpose;
-use r1_funcore::openai::chat::request::Location;
+use r1_funcore::mistral::chat::request::Location;
 use std::io::{self, Read};
 use std::net::SocketAddr;
 

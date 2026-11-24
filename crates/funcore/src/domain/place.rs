@@ -4,7 +4,7 @@ use crate::base::json;
 use crate::base::time::SECONDS_PER_MINUTE;
 use crate::base::time::offset;
 use crate::codec::http::{CLOSE, USER_AGENT};
-use crate::openai::chat::request::Location;
+use crate::mistral::chat::request::Location;
 use alloc::format;
 use alloc::string::{String, ToString};
 

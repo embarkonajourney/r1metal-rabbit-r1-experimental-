@@ -1,8 +1,8 @@
 mod gather;
 pub mod request;
 
-use crate::openai::Account;
-use crate::openai::write::{self, WorkPoller};
+use crate::mistral::Account;
+use crate::mistral::write::{self, WorkPoller};
 use crate::power::alarm::Alarm;
 use crate::storage::Data;
 use crate::sync::Board;
@@ -23,8 +23,8 @@ use r1_funcore::domain::paper::pages::to_pages;
 use r1_funcore::domain::paper::sheet::{self, Subject};
 use r1_funcore::gfx::palette::Roles;
 use r1_funcore::hw::power::alarm::Reason;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::summary::{Poll, Summary, WorkStatus};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::summary::{Poll, Summary, WorkStatus};
 use std::io;
 use std::os::fd::RawFd;
 use std::sync::Arc;

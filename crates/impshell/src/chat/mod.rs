@@ -3,7 +3,7 @@ mod read;
 mod recollect;
 mod turn;
 
-use crate::openai::Account;
+use crate::mistral::Account;
 use crate::storage::Data;
 use crate::voiced::{Part, Shared};
 use crate::{clock, crypto, log, sys};

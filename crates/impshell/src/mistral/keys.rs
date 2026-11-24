@@ -2,12 +2,12 @@ use super::Account;
 use crate::log;
 use crate::sync::Board;
 use r1_funcore::base::handoff::Step;
-use r1_funcore::openai::key::{
+use r1_funcore::mistral::key::{
     CheckResult, Order, REFUSED_LINE, Report, SCANNED_KEY, STORED_KEY, Source, State, Verdict, parse_verdict,
     to_checked_line,
 };
-use r1_funcore::openai::models;
-use r1_funcore::openai::request::parse_target;
+use r1_funcore::mistral::models;
+use r1_funcore::mistral::request::parse_target;
 use std::io;
 use std::os::fd::RawFd;
 use std::sync::Arc;
@@ -17,7 +17,7 @@ fn ask_verdict(account: &Account, key: &str, label: &str) -> Option<Verdict> {
     let hold = match account.0.online.hold() {
         Ok(hold) => hold,
         Err(reason) => {
-            log!("openai: {label} is not checked: {reason}");
+            log!("mistral: {label} is not checked: {reason}");
             return None;
         }
     };
@@ -31,7 +31,7 @@ fn ask_verdict(account: &Account, key: &str, label: &str) -> Option<Verdict> {
             verdict
         }
         Err(e) => {
-            log!("openai: checking {label}: {e}");
+            log!("mistral: checking {label}: {e}");
             Verdict::Unanswered
         }
     })
@@ -48,7 +48,7 @@ fn check_key(account: &Account, key: &str) -> CheckResult {
                 true
             }
             Err(e) => {
-                log!("openai: the service knows the key, which is not kept: {e}");
+                log!("mistral: the service knows the key, which is not kept: {e}");
                 false
             }
         };
@@ -60,7 +60,7 @@ fn recheck_key(account: &Account) -> bool {
         Ok(Some(key)) => key,
         Ok(None) => return false,
         Err(e) => {
-            log!("openai: reading the kept key to check it anew: {e}");
+            log!("mistral: reading the kept key to check it anew: {e}");
             return false;
         }
     };
@@ -69,7 +69,7 @@ fn recheck_key(account: &Account) -> bool {
     }
     match account.remove_key() {
         Ok(()) => log!("{REFUSED_LINE}"),
-        Err(e) => log!("openai: the service refuses the kept key, which could not be taken away: {e}"),
+        Err(e) => log!("mistral: the service refuses the kept key, which could not be taken away: {e}"),
     }
     true
 }
@@ -85,12 +85,12 @@ fn work(account: &Account, board: &Board<State>) {
                         true
                     }
                     Err(e) => {
-                        log!("openai: keeping the key the flash gave: {e}");
+                        log!("mistral: keeping the key the flash gave: {e}");
                         false
                     }
                 });
                 let has_key =
-                    account.has_key().inspect_err(|e| log!("openai: reading whether a key is kept: {e}")).ok();
+                    account.has_key().inspect_err(|e| log!("mistral: reading whether a key is kept: {e}")).ok();
                 Report::with_start(has_key, is_flashed)
             }
             Order::Check(number, key) => Report::from_check(number, check_key(account, &key)),
@@ -98,7 +98,7 @@ fn work(account: &Account, board: &Board<State>) {
                 let result = account.write_key(&key).map_err(|e| e.to_string());
                 match &result {
                     Ok(()) => log!("{}", Source::Console.to_log_line()),
-                    Err(reason) => log!("openai: keeping a key the console handed over: {reason}"),
+                    Err(reason) => log!("mistral: keeping a key the console handed over: {reason}"),
                 }
                 Report::from_handover(result)
             }

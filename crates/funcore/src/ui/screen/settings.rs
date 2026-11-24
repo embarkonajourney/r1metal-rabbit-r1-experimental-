@@ -17,9 +17,9 @@ use alloc::string::String;
 use core::fmt::Write;
 
 const CLICK_TO_SET: &str = "CLICK TO SET";
-const READ_ON: &str = "WHAT COMES, BY OPENAI";
+const READ_ON: &str = "WHAT COMES, BY MISTRAL";
 const READ_OFF: &str = "OFF, ONLY SHOWN";
-const SAID_AS_TEXT: &str = "AS TEXT, BY OPENAI";
+const SAID_AS_TEXT: &str = "AS TEXT, BY MISTRAL";
 const SAID_AS_VOICE: &str = "AS VOICE NOTES";
 const TEXT_ALONE: &str = "PHOTOS, VOICE NOTES AS WORDS";
 const NO_LIMIT: &str = "NONE";
@@ -54,7 +54,7 @@ fn listed_on(setting: Setting) -> Option<Destination> {
 
 const fn tool_word(tool: Tool) -> &'static str {
     match tool {
-        Tool::Web => "SEARCHES THE WEB, BY OPENAI",
+        Tool::Web => "SEARCHES THE WEB, BY MISTRAL",
         Tool::Device => "OPENS SCREENS, CHANGES SETTINGS",
         Tool::Notes => "READS NOTES AND TRANSLATIONS",
         Tool::News => "READS THE EDITIONS",

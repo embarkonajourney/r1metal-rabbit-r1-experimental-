@@ -14,9 +14,9 @@ pub const FILE: &str = "flashed";
 /// The file in the settings' directory holding the stamp of the last flash taken.
 pub const STAMP_FILE: &str = "flash";
 const KEY_STAMP: &str = "stamp";
-const KEY_OPENAI: &str = "key";
+const KEY_MISTRAL: &str = "key";
 
-/// What a flash chose: its unique stamp, the logging, and the OpenAI key checked on the computer.
+/// What a flash chose: its unique stamp, the logging, and the Mistral key checked on the computer.
 #[derive(Clone, PartialEq, Eq)]
 pub struct Flash {
     pub stamp: u64,
@@ -36,12 +36,12 @@ impl core::fmt::Debug for Flash {
 }
 
 impl Flash {
-    /// Parses a flash's file by the last line of a key: none without a stamp, a key only where it looks like OpenAI's, logging on by default.
+    /// Parses a flash's file by the last line of a key: none without a stamp, a key only where it looks like Mistral's, logging on by default.
     pub fn parse(text: &str) -> Option<Flash> {
         Some(Flash {
             stamp: values(text, KEY_STAMP).last()?.trim().parse().ok()?,
             logging: last_value(text, KEY_LOGGING, Logging::parse).unwrap_or(Logging::On),
-            key: values(text, KEY_OPENAI).last().and_then(crate::openai::key::parse_key).map(String::from),
+            key: values(text, KEY_MISTRAL).last().and_then(crate::mistral::key::parse_key).map(String::from),
         })
     }
 
@@ -49,7 +49,7 @@ impl Flash {
     pub fn to_text(&self) -> String {
         let mut text = format!("{KEY_STAMP} {}\n{KEY_LOGGING} {}\n", self.stamp, self.logging.to_word());
         if let Some(key) = &self.key {
-            let _ = writeln!(text, "{KEY_OPENAI} {key}");
+            let _ = writeln!(text, "{KEY_MISTRAL} {key}");
         }
         text
     }
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn flash_file_round_trip() {
-        let key = Some(String::from("sk-proj-Fake0Key_-9"));
+        let key = Some(String::from("FakeKey0123456789AbCdEf012345678"));
         for flash in [
             Flash { stamp: 1_792_000_000, logging: Logging::On, key: None },
             Flash { stamp: 7, logging: Logging::Off, key: key.clone() },
@@ -98,7 +98,7 @@ mod tests {
         assert_eq!(Flash { stamp: 7, logging: Logging::Debug, key: None }.to_text(), "stamp 7\nlogging debug\n");
         assert_eq!(
             Flash { stamp: 7, logging: Logging::On, key: key.clone() }.to_text(),
-            "stamp 7\nlogging on\nkey sk-proj-Fake0Key_-9\n"
+            "stamp 7\nlogging on\nkey FakeKey0123456789AbCdEf012345678\n"
         );
         assert_eq!(
             Flash::parse("stamp 9\n"),
@@ -109,7 +109,7 @@ mod tests {
         assert_eq!(Flash::parse("logging off\n"), None, "no flash without a stamp");
         assert_eq!(Flash::parse("stamp soon\nlogging off\n"), None);
         assert_eq!(
-            Flash::parse("stamp 8\nlogging off\nkey sk-proj-Fake0Key_-9\nstamp 9\nlogging loud\nkey not a key\n"),
+            Flash::parse("stamp 8\nlogging off\nkey FakeKey0123456789AbCdEf012345678\nstamp 9\nlogging loud\nkey not a key\n"),
             Some(Flash { stamp: 9, logging: Logging::Off, key: None }),
             "of a key written twice the last line counts, and of the logging the last that names one"
         );
@@ -131,7 +131,7 @@ mod tests {
             (Some(flash.to_stamp_text()), None),
             "a flash without a key keeps its stamp at once"
         );
-        let with_key = Flash { key: Some("sk-proj-Fake0Key_-9".into()), ..flash.clone() };
+        let with_key = Flash { key: Some("FakeKey0123456789AbCdEf012345678".into()), ..flash.clone() };
         assert_eq!(
             with_key.stamps_to_keep(),
             (None, Some(with_key.to_stamp_text())),

@@ -384,7 +384,7 @@ mod tests {
             ("/data/camera/videos/v.mp4", &long),
             ("/data/chat/core.md", b"core"),
             ("/data/news/empty.md", b""),
-            ("/data/.r1metal/openai/key", b"sk"),
+            ("/data/.r1metal/mistral/key", b"sk"),
             ("/data/.r1metal/battery/gauge", b"the device's own"),
         ]);
         keeping.links.insert("/data/camera/latest".into());
@@ -405,7 +405,7 @@ mod tests {
             ("camera/videos/v.mp4", &long),
             ("audio/notes/n.m4a", b"note"),
             ("news/empty.md", b""),
-            (".r1metal/openai/key", b"sk"),
+            (".r1metal/mistral/key", b"sk"),
         ];
         assert_eq!(copied, (5, held.iter().map(|(_, bytes)| bytes.len() as u64).sum()));
         let listings = device(&mut source).taken.iter().filter(|line| *line == "ls /data/camera").count();
@@ -428,7 +428,7 @@ mod tests {
             [
                 "/data/.restore.new/camera/videos",
                 "/data/.restore.new/news",
-                "/data/.restore.new/.r1metal/openai",
+                "/data/.restore.new/.r1metal/mistral",
                 "/data/.restore.new/camera/pictures",
                 "/data/.restore.new/audio/notes"
             ],

@@ -1,4 +1,4 @@
-//! The ledger of what OpenAI's services were paid, and its file: a line a month, the newest first, each kind apart, and a month's total where its kinds are forgotten.
+//! The ledger of what Mistral's services were paid, and its file: a line a month, the newest first, each kind apart, and a month's total where its kinds are forgotten.
 
 use super::image::Usage;
 use super::tokens;
@@ -301,7 +301,7 @@ impl Ledger {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::image::MEDIUM;
+    use crate::mistral::image::MEDIUM;
 
     fn untyped_micros(month: &Month) -> u64 {
         month.micros.saturating_sub(month.paid.iter().fold(0, |all: u64, paid| all.saturating_add(paid.micros)))

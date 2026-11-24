@@ -1,4 +1,4 @@
-//! A photo redrawn by OpenAI's image model: the request, its answer and what a picture costs.
+//! A photo redrawn by Mistral's image model: the request, its answer and what a picture costs.
 
 use super::models::image::{COMPRESSION, FORMAT, MODEL, QUALITY, SIDE};
 use super::money::dollars;
@@ -8,7 +8,7 @@ use crate::base::json::number_at;
 use crate::base::json::text_at;
 use crate::codec::form::Form;
 use crate::codec::http::OK;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

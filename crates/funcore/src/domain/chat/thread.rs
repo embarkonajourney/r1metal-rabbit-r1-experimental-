@@ -3,7 +3,7 @@
 use super::onboarding::{Plan, SEED_BYTES};
 use crate::base::code::{hex, unhex};
 use crate::base::json::value_at;
-use crate::openai::chat::answer::is_compaction;
+use crate::mistral::chat::answer::is_compaction;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

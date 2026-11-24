@@ -8,7 +8,7 @@ use super::paper::names::{directory, edition_folder, folder, rundown_file, rundo
 use super::paper::sheet;
 use super::shelf::Shelf;
 use super::tally::Tally;
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 use crate::storage::paths::Listed;
 use crate::storage::{Files, NEWS};
 use alloc::format;

@@ -6,8 +6,8 @@ pub mod state;
 
 use super::paper::markdown::Blocks;
 use super::shelf::Shelf;
-use crate::openai::aloud::TASK;
-use crate::openai::ledger::Kind;
+use crate::mistral::aloud::TASK;
+use crate::mistral::ledger::Kind;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

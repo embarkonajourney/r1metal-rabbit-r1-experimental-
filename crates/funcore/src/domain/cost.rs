@@ -1,16 +1,16 @@
-//! What OpenAI's services were paid, as lines: each app in all and a line a month, with their pages.
+//! What Mistral's services were paid, as lines: each app in all and a line a month, with their pages.
 
 use super::device::HAS_EXTRAS;
 use super::scene::{AUDIO_NOTE, BELL, CAMERA, CHAT, NEWS, POKEDEX, SIGNAL, TRANSLATOR, WEB};
 use crate::base::time::SECONDS_PER_MINUTE;
-use crate::openai::ledger::{KINDS, Kind, Ledger, Month, Paid};
-use crate::openai::money::dollars;
+use crate::mistral::ledger::{KINDS, Kind, Ledger, Month, Paid};
+use crate::mistral::money::dollars;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::iter;
 
-const OPENAI: &str = "OPENAI";
+const MISTRAL: &str = "MISTRAL";
 const UNKNOWN: &str = "UNKNOWN";
 pub(crate) const MONTH: &str = "MONTH";
 const SUMMARIES: &str = "SUMMARIES";
@@ -68,7 +68,7 @@ impl Figure {
 
     /// The first line alone, for a ledger that cannot be read.
     pub fn unknown() -> Figure {
-        Figure::new(OPENAI, UNKNOWN)
+        Figure::new(MISTRAL, UNKNOWN)
     }
 
     // The total's value in two: the amount it begins with, and the words after it.
@@ -136,7 +136,7 @@ fn add_up(ledger: &Ledger) -> ([Paid; KINDS], u64) {
 
 /// Every line of the cost out of a ledger.
 pub fn to_figures(ledger: &Ledger, year: u32, month: u8) -> Vec<Figure> {
-    let total = Figure::new(OPENAI, to_summary(ledger, year, month));
+    let total = Figure::new(MISTRAL, to_summary(ledger, year, month));
     let (paid, seconds) = add_up(ledger);
     let apps: Vec<&App> = APPS.iter().filter(|app| is_listed(app, &paid)).collect();
     let app_figures = apps.iter().map(|app| app_figure(app, (&paid, seconds), |cost| format!("{cost} IN ALL")));
@@ -147,7 +147,7 @@ pub fn to_figures(ledger: &Ledger, year: u32, month: u8) -> Vec<Figure> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::ledger::Entry;
+    use crate::mistral::ledger::Entry;
     use alloc::vec;
 
     fn figure<'a>(figures: &'a [Figure], name: &str) -> &'a Figure {
@@ -174,7 +174,7 @@ mod tests {
         assert_eq!(
             figures.iter().map(|figure| figure.name.as_str()).collect::<Vec<_>>(),
             [
-                OPENAI, CHAT, SIGNAL, CAMERA, AUDIO_NOTE, TRANSLATOR, NEWS, WEB, BELL, POKEDEX, "2026-10", "2026-09",
+                MISTRAL, CHAT, SIGNAL, CAMERA, AUDIO_NOTE, TRANSLATOR, NEWS, WEB, BELL, POKEDEX, "2026-10", "2026-09",
                 "2026-08"
             ],
             "the total, every app in the tree's order, the Pokedex once something was paid for it, then the months, the newest first"
@@ -198,7 +198,7 @@ mod tests {
             !is_listed(&pokedex, &[Paid::default(); KINDS]) && is_listed(&pokedex, &add_up(&ledger()).0),
             "without the extras the Pokedex is listed once something was paid for it, and not before"
         );
-        assert_eq!(Figure::unknown(), Figure { name: OPENAI.into(), value: UNKNOWN.into(), page: None });
+        assert_eq!(Figure::unknown(), Figure { name: MISTRAL.into(), value: UNKNOWN.into(), page: None });
     }
 
     #[test]

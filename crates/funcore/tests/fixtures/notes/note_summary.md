@@ -1,6 +1,6 @@
 # Note of 16 October 2026, 14:02
 
-Summary of `20261016_140200.m4a` (1:15), made by OpenAI's `gpt-6-luna` from its [transcript](20261016_140200_transcript.md).
+Summary of `20261016_140200.m4a` (1:15), made by Mistral's `gpt-6-luna` from its [transcript](20261016_140200_transcript.md).
 
 ---
 

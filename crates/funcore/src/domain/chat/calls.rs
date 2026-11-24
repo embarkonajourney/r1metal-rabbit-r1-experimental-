@@ -9,7 +9,7 @@ use crate::base::time::Moment;
 use crate::base::time::stamp::is_compact_day;
 use crate::domain::settings::{Setting, Settings, Tool, Value};
 use crate::domain::signal::robot::{Question, Reply};
-use crate::openai::chat::answer::{Answer, Call};
+use crate::mistral::chat::answer::{Answer, Call};
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

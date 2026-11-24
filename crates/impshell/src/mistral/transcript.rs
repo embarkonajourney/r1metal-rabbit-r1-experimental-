@@ -3,10 +3,10 @@ use crate::log;
 use crate::wifi::radio::NetworkDown;
 use r1_funcore::codec::form;
 use r1_funcore::codec::http::POST;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::models::transcriber;
-use r1_funcore::openai::request::{finished_stream, parse_target};
-use r1_funcore::openai::transcript::{self, Stream, Subject};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::models::transcriber;
+use r1_funcore::mistral::request::{finished_stream, parse_target};
+use r1_funcore::mistral::transcript::{self, Stream, Subject};
 use std::io;
 use std::time::Instant;
 
@@ -17,7 +17,7 @@ pub fn prepare(account: &Account, down: &NetworkDown) {
         Ok(account.prepare_connection(&target, down)?)
     });
     if let Err(reason) = ready {
-        log!("openai: no connection stands ready for a recording's words: {reason}");
+        log!("mistral: no connection stands ready for a recording's words: {reason}");
     }
 }
 
@@ -63,7 +63,7 @@ pub fn transcribe(
 fn accept_ended(result: io::Result<(u16, Vec<u8>)>, has_end: bool) -> io::Result<(u16, Vec<u8>)> {
     result.or_else(|e| match finished_stream(has_end) {
         Some(answer) => {
-            log!("openai: the connection failed after the answer's end, which stands: {e}");
+            log!("mistral: the connection failed after the answer's end, which stands: {e}");
             Ok(answer)
         }
         None => Err(e),
@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn no_key_no_transcript() {
-        let (account, down) = (crate::openai::tests::unusable(), up());
+        let (account, down) = (crate::mistral::tests::unusable(), up());
         let prompt = pokedex::prompt(pokedex::Language::German);
         let subjects = [
             (Subject::Note, ""),

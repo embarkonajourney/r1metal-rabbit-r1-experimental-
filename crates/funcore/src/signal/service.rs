@@ -608,12 +608,12 @@ mod tests {
         assert!(
             !is_pinned_host("signal.org")
                 && !is_pinned_host("chat.signal.org.example")
-                && !is_pinned_host("api.openai.com")
+                && !is_pinned_host("api.mistral.ai")
                 && !is_pinned_host("cdn4.signal.org")
                 && !is_pinned_host("cdn.signal.org.example")
         );
         assert_eq!(
-            [to_purpose("cdn2.signal.org", Purpose::Http), to_purpose("api.openai.com", Purpose::Http)],
+            [to_purpose("cdn2.signal.org", Purpose::Http), to_purpose("api.mistral.ai", Purpose::Http)],
             [Purpose::Signal, Purpose::Http],
             "a host of Signal's is reached under its roots, whoever asks; any other as asked"
         );

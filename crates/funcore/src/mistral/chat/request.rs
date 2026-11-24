@@ -2,9 +2,9 @@
 
 use crate::base::code::base64_onto;
 use crate::base::json::escape;
-use crate::openai::models::Thinking;
-use crate::openai::models::chat::{CACHE_HOURS, COMPACT_THRESHOLD, DETAIL, SEARCH_BUDGET, SEARCH_CONTEXT};
-use crate::openai::models::writer::VERBOSITY;
+use crate::mistral::models::Thinking;
+use crate::mistral::models::chat::{CACHE_HOURS, COMPACT_THRESHOLD, DETAIL, SEARCH_BUDGET, SEARCH_CONTEXT};
+use crate::mistral::models::writer::VERBOSITY;
 use alloc::format;
 use alloc::string::String;
 use core::fmt::Write;

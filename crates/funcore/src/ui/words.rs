@@ -29,7 +29,7 @@ pub(super) const CLOCK_RIGHT: &str = "CLOCK IS RIGHT";
 
 pub(super) const fn cause_word(cause: Cause) -> &'static str {
     match cause {
-        Cause::NoKey => "NO OPENAI KEY",
+        Cause::NoKey => "NO MISTRAL KEY",
         Cause::Limit => "LIMIT REACHED",
         Cause::NoNetwork => "NO NETWORK",
         Cause::NoAnswer => "NO ANSWER",

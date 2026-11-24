@@ -65,8 +65,8 @@ impl State {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::ledger::{Entry, Kind};
-    use crate::openai::models::{Effort, Model};
+    use crate::mistral::ledger::{Entry, Kind};
+    use crate::mistral::models::{Effort, Model};
 
     #[test]
     fn ledger_loan() {

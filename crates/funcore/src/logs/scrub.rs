@@ -204,9 +204,9 @@ mod tests {
     fn signal_lines() {
         for trace in [
             "14,90,7,-; (2)[412:signal]r1metal: signal: the stay ended: gone",
-            "14,91,7,-; (1)[530:drafts]r1metal: web: api.openai.com named in 3 ms",
-            "14,92,7,-; (0)[531:auto]r1metal: openai: a turn",
-            "14,93,7,-; (3)[600:drafter]r1metal: openai: written down",
+            "14,91,7,-; (1)[530:drafts]r1metal: web: api.mistral.ai named in 3 ms",
+            "14,92,7,-; (0)[531:auto]r1metal: mistral: a turn",
+            "14,93,7,-; (3)[600:drafter]r1metal: mistral: written down",
             "14,94,7,-; (1)[356:init]r1metal: signal: a frame that is none of the service's",
             "<6>[  9.1]  (2)[412:signal]r1metal: names: chat.signal.org",
         ] {

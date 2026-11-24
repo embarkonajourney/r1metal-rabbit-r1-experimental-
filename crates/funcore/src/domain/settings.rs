@@ -10,8 +10,8 @@ use crate::gfx::palette;
 use crate::gfx::theme::{THEMES, Theme};
 use crate::hw::sound::volume;
 use crate::logs::Logging;
-use crate::openai::account::Terms;
-use crate::openai::models::{Effort, Model, Task, Thinking};
+use crate::mistral::account::Terms;
+use crate::mistral::models::{Effort, Model, Task, Thinking};
 use alloc::format;
 use alloc::string::String;
 use core::fmt::Write;
@@ -53,7 +53,7 @@ const KEY_VPN: &str = "vpn";
 const NO_LIMIT: &str = "none";
 const SAID_AS_TEXT: &str = "text";
 const SAID_AS_VOICE: &str = "voice";
-// The most OpenAI's services may cost a month, in dollars, that the owner may set; or none.
+// The most Mistral's services may cost a month, in dollars, that the owner may set; or none.
 const LIMITS: [u16; 8] = [1, 2, 5, 10, 20, 25, 50, 100];
 const DEFAULT_LIMIT: u16 = 25;
 const HOURS_IN_A_DAY: u8 = 24;
@@ -564,7 +564,7 @@ impl Settings {
         match setting {
             // A tool switched on lets the robot read or do more.
             Setting::Tool(tool) => !next.tools.is_on(tool) || self.tools.is_on(tool),
-            // Read aloud, and written down where they are said, a conversation's words go to OpenAI.
+            // Read aloud, and written down where they are said, a conversation's words go to Mistral.
             Setting::SignalAloud => !next.is_signal_aloud || self.is_signal_aloud,
             Setting::SaidVoice => next.is_said_voice || !self.is_said_voice,
             // A PIN no longer kept is a secret fewer on the device.
@@ -1135,7 +1135,7 @@ pub(crate) mod tests {
         let voiced = Settings { is_said_voice: true, is_signal_aloud: false, ..settings };
         assert!(
             !voiced.is_eased(Setting::SaidVoice, &settings) && !voiced.is_eased(Setting::SignalAloud, &settings),
-            "what sends a conversation's words to OpenAI waits for the owner's click"
+            "what sends a conversation's words to Mistral waits for the owner's click"
         );
         assert_eq!(
             change("robot_model", "gpt-6-astra").map(|(next, eased)| (next.terms.thinking(Task::Chat).model(), eased)),

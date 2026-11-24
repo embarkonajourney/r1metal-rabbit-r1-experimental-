@@ -1,9 +1,9 @@
 use super::{Account, Session};
 use crate::wifi::radio::NetworkDown;
-use r1_funcore::openai::aloud;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::ledger::Kind;
-use r1_funcore::openai::models::reader::{ADDRESS, TIMEOUT};
+use r1_funcore::mistral::aloud;
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::ledger::Kind;
+use r1_funcore::mistral::models::reader::{ADDRESS, TIMEOUT};
 use std::io;
 
 /// A reader's session: the realtime model's voice for passage after passage of one task, which its messages are made with.
@@ -46,7 +46,7 @@ mod tests {
 
     #[test]
     fn no_key_no_session() {
-        let account = crate::openai::tests::unusable();
+        let account = crate::mistral::tests::unusable();
         assert!(matches!(
             ReadingSession::open(&account, &crate::wifi::radio::tests::up(), aloud::TASK),
             Err(Fault::Temporary(_))

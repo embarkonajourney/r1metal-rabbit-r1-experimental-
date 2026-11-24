@@ -1,23 +1,21 @@
-//! The key to OpenAI's services: its format, its file, the verdict of its check, and the keeper thread's state.
+//! The key to Mistral's services: its format, its file, the verdict of its check, and the keeper thread's state.
 
-use super::refusal::parse_refusal_bytes;
 use crate::base::handoff::{Orders, Ticket};
 use crate::codec::http::{FORBIDDEN, OK, UNAUTHORIZED};
 use alloc::format;
 use alloc::string::String;
 
-const PREFIX: &str = "sk-";
 /// The key's directory under the data partition's private directory.
-pub const DIRECTORY: &str = ".r1metal/openai";
+pub const DIRECTORY: &str = ".r1metal/mistral";
 pub const FILE: &str = "key";
 /// The flasher's command that makes the code the key's window scans.
 pub const SCAN_COMMAND: &str = "r1 key --qr";
 pub const SCANNED_KEY: &str = "a key read off a code";
 pub const STORED_KEY: &str = "the kept key";
-pub const REFUSED_LINE: &str = "openai: the service refuses the kept key, which is kept no more";
+pub const REFUSED_LINE: &str = "mistral: the service refuses the kept key, which is kept no more";
 
 pub fn to_checked_line(name: &str, status: u16, verdict: Verdict) -> String {
-    format!("openai: {name} was checked: status {status}, {}", verdict.to_word())
+    format!("mistral: {name} was checked: status {status}, {}", verdict.to_word())
 }
 
 /// Where a stored key came from.
@@ -36,7 +34,7 @@ impl Source {
             Source::Flash => "the key the flash gave is",
             Source::Console => "a key the console handed over is",
         };
-        format!("openai: {key} kept in {DIRECTORY}/{FILE}")
+        format!("mistral: {key} kept in {DIRECTORY}/{FILE}")
     }
 }
 
@@ -99,12 +97,12 @@ impl Verdict {
     }
 }
 
-/// The verdict of an answer of that status and body to the check.
-pub fn parse_verdict(status: u16, body: &[u8]) -> Verdict {
-    match (status, parse_refusal_bytes(body)) {
-        (OK, _) => Verdict::Works,
-        (status, Some(refusal)) if refusal.is_of_unknown_key(Some(status)) => Verdict::Refused,
-        (UNAUTHORIZED | FORBIDDEN, Some(_)) => Verdict::Known,
+/// The verdict of an answer of that status and body to the check; the body goes unread, for Mistral's refusals of a key are its statuses alone.
+pub fn parse_verdict(status: u16, _body: &[u8]) -> Verdict {
+    match status {
+        OK => Verdict::Works,
+        UNAUTHORIZED => Verdict::Refused,
+        FORBIDDEN => Verdict::Known,
         _ => Verdict::Unanswered,
     }
 }
@@ -223,12 +221,11 @@ impl State {
     }
 }
 
-/// The trimmed key of a text, if it looks like one of OpenAI's: the prefix, then letters, digits, hyphens and underscores alone.
+/// The trimmed key of a text, if it looks like one of Mistral's: thirty-two letters and digits alone.
 pub fn parse_key(text: &str) -> Option<&str> {
     let key = text.trim();
-    let rest = key.strip_prefix(PREFIX)?;
-    let is_valid = rest.bytes().all(|byte| byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_');
-    (!rest.is_empty() && is_valid).then_some(key)
+    let is_valid = key.bytes().all(|byte| byte.is_ascii_alphanumeric());
+    (key.len() == 32 && is_valid).then_some(key)
 }
 
 #[cfg(test)]
@@ -237,54 +234,31 @@ mod tests {
 
     #[test]
     fn key_format() {
-        assert_eq!(parse_key(" sk-proj-Ab3_-x9\n"), Some("sk-proj-Ab3_-x9"), "the blanks about it go");
-        assert_eq!(parse_key("sk-Zx81"), Some("sk-Zx81"));
-        for invalid in
-            ["", "sk-", "pk-live-abc", "sk-ab cd", "sk-ab\ncd", "sk-abc+", "https://example.org/sk-a", "sk-\u{E4}"]
-        {
+        assert_eq!(parse_key(" AbCdEf0123456789AbCdEf0123456789 \n"), Some("AbCdEf0123456789AbCdEf0123456789"), "the blanks about it go");
+        assert_eq!(parse_key("AbCdEf0123456789AbCdEf0123456789"), Some("AbCdEf0123456789AbCdEf0123456789"));
+        for invalid in ["", "AbCdEf0123456789AbCdEf012345678", "AbCdEf0123456789AbCdEf01234567890",
+            "sk-AbCdEf0123456789AbCdEf0123456789", "AbCdEf 123456789AbCdEf0123456789a", "AbCdEf-123456789AbCdEfaABcdefg",
+            "https://example.org/AbCdEf0123456789AbCdEf0123456789", "AbCdEf\u{E4}123456789AbCdEf0123456789"] {
             assert_eq!(parse_key(invalid), None, "{invalid:?}");
         }
     }
 
     #[test]
     fn verdicts() {
-        let refusal = |code: &str| {
-            alloc::format!(
-                "{{\"error\": {{\"message\": \"x\", \"type\": \"invalid_request_error\", \"code\": {code}}}}}"
-            )
-        };
-        let (unknown_key, scope, no_code) =
-            (refusal("\"invalid_api_key\""), refusal("\"missing_scope\""), refusal("null"));
         assert_eq!(parse_verdict(200, b"{\"data\": []}"), Verdict::Works);
-        assert_eq!(parse_verdict(401, unknown_key.as_bytes()), Verdict::Refused, "a key mistyped, deleted or revoked");
-        let no_permission =
-            br#"{"error":"You have insufficient permissions for this operation. Missing scopes: api.model.read."}"#;
+        assert_eq!(parse_verdict(401, b"{\"message\": \"Unauthorized\"}"), Verdict::Refused, "a key mistyped, deleted or revoked");
         assert_eq!(
-            [
-                parse_verdict(401, scope.as_bytes()),
-                parse_verdict(401, no_code.as_bytes()),
-                parse_verdict(403, unknown_key.as_bytes()),
-                parse_verdict(403, no_permission)
-            ],
-            [Verdict::Known; 4],
-            "a key without the scope to list the models, and a 403, as one without the permission to gets, come from a key the service knows"
+            [parse_verdict(403, b"{\"message\": \"not allowed\"}"), parse_verdict(403, b"")],
+            [Verdict::Known; 2],
+            "a key without the permission to list the models comes from a key the service knows"
         );
         assert_eq!(
-            [
-                parse_verdict(401, b""),
-                parse_verdict(401, b"<html>401</html>"),
-                parse_verdict(429, scope.as_bytes()),
-                parse_verdict(500, b"")
-            ],
-            [Verdict::Unanswered; 4],
-            "a refusal that is none of the service's, and any other status, tell nothing of the key"
+            [parse_verdict(429, b""), parse_verdict(500, b""), parse_verdict(503, b"")],
+            [Verdict::Unanswered; 3],
+            "any other status tells nothing of the key"
         );
-        assert!(crate::openai::models::check::ADDRESS.starts_with("https://api.openai.com/"));
-        assert!(
-            is_unknown_in(401, unknown_key.as_bytes())
-                && !is_unknown_in(401, scope.as_bytes())
-                && !is_unknown_in(200, b"")
-        );
+        assert!(crate::mistral::models::check::ADDRESS.starts_with("https://api.mistral.ai/"));
+        assert!(is_unknown_in(401, b"") && !is_unknown_in(403, b"") && !is_unknown_in(200, b""));
     }
 
     #[test]
@@ -292,14 +266,14 @@ mod tests {
         assert_eq!(
             [Source::Check, Source::Flash, Source::Console].map(Source::to_log_line),
             [
-                "openai: the service knows the key, which is kept in .r1metal/openai/key",
-                "openai: the key the flash gave is kept in .r1metal/openai/key",
-                "openai: a key the console handed over is kept in .r1metal/openai/key",
+                "mistral: the service knows the key, which is kept in .r1metal/mistral/key",
+                "mistral: the key the flash gave is kept in .r1metal/mistral/key",
+                "mistral: a key the console handed over is kept in .r1metal/mistral/key",
             ]
         );
         assert_eq!(
             to_checked_line(STORED_KEY, 401, Verdict::Refused),
-            "openai: the kept key was checked: status 401, Refused"
+            "mistral: the kept key was checked: status 401, Refused"
         );
         assert_eq!(
             [Verdict::Works, Verdict::Known, Verdict::Refused, Verdict::Unanswered].map(Verdict::to_word),
@@ -314,10 +288,10 @@ mod tests {
     #[test]
     fn file_text_and_bearer() {
         assert_eq!(
-            (to_file_text(" sk-a1 \n"), parse_file("sk-a1\n"), parse_file(" \n"), parse_file("")),
-            ("sk-a1\n".into(), Some("sk-a1"), None, None)
+            (to_file_text(" AbCdEf0123456789 \n"), parse_file("AbCdEf0123456789\n"), parse_file(" \n"), parse_file("")),
+            ("AbCdEf0123456789\n".into(), Some("AbCdEf0123456789"), None, None)
         );
-        assert_eq!(to_bearer("sk-a1"), "Bearer sk-a1");
+        assert_eq!(to_bearer("AbCdEf0123456789"), "Bearer AbCdEf0123456789");
     }
 
     #[test]
@@ -385,18 +359,18 @@ mod tests {
         let mut state = State::default();
         assert!(!state.ask_check(None), "no check waited for, none queued");
         assert!(
-            state.ask_check(Some((4, "sk-a"))) && !state.ask_check(Some((4, "sk-a"))),
+            state.ask_check(Some((4, "AbCdEf0123456789AbCdEf0123456789"))) && !state.ask_check(Some((4, "AbCdEf0123456789AbCdEf0123456789"))),
             "the check the window waits for is queued once"
         );
         assert!(
-            matches!(state.orders.next_step(), Some(Step::Serve(Order::Check(4, key))) if key == "sk-a")
+            matches!(state.orders.next_step(), Some(Step::Serve(Order::Check(4, key))) if key == "AbCdEf0123456789AbCdEf0123456789")
                 && state.orders.next_step().is_none(),
             "by its number, with its key"
         );
         state.add_report(Report::from_check(4, CheckResult::Unanswered));
-        assert!(!state.ask_check(Some((4, "sk-a"))), "nor again while its report waits to be taken");
+        assert!(!state.ask_check(Some((4, "AbCdEf0123456789AbCdEf0123456789"))), "nor again while its report waits to be taken");
         assert_eq!(state.take_report().check, Some((4, CheckResult::Unanswered)));
-        assert!(state.ask_check(Some((4, "sk-a"))), "its report taken, the same check may be asked for again");
+        assert!(state.ask_check(Some((4, "AbCdEf0123456789AbCdEf0123456789"))), "its report taken, the same check may be asked for again");
     }
 
     #[test]

@@ -11,7 +11,7 @@ use super::voices;
 use crate::base::time::SECONDS_PER_MINUTE;
 use crate::domain::cause::Cause;
 use crate::gfx::palette::Roles;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use crate::signal::address::{Peer, ServiceId};
 use crate::signal::attachment::{Finish, Job};
 use crate::signal::command::{Command, Outbound, Outgoing};

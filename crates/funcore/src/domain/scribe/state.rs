@@ -4,8 +4,8 @@ use super::Entry;
 use crate::domain::backlog::{Backlog, Holder};
 use crate::domain::cause::Cause;
 use crate::gfx::palette::Roles;
-use crate::openai::fault::Fault;
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::fault::Fault;
+use crate::mistral::ledger::SummaryKind;
 use alloc::string::String;
 
 /// The model an entry is with.
@@ -88,7 +88,7 @@ impl State {
 mod tests {
     use super::*;
     use crate::domain::backlog::Status;
-    use crate::openai::refusal::Refusal;
+    use crate::mistral::refusal::Refusal;
     use alloc::vec;
     use alloc::vec::Vec;
 

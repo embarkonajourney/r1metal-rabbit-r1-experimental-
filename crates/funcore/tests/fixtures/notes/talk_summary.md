@@ -1,6 +1,6 @@
 # Conversation of 16 October 2026, 14:02
 
-Summary, in both of its languages, of the [conversation](20261016_140200_conversation.md) the translator rendered, made by OpenAI's `gpt-6-luna`.
+Summary, in both of its languages, of the [conversation](20261016_140200_conversation.md) the translator rendered, made by Mistral's `gpt-6-luna`.
 
 ---
 

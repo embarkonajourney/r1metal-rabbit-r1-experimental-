@@ -1,6 +1,6 @@
 //! Why something shown to the owner came to nothing.
 
-use crate::openai::fault::{Ending, Fault};
+use crate::mistral::fault::{Ending, Fault};
 use crate::storage::SaveFault;
 
 /// A reason the screens tell in a word.

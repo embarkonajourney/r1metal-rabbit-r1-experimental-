@@ -2,17 +2,17 @@ use super::{Account, Session};
 use crate::log;
 use crate::net::websocket::Incoming;
 use crate::wifi::radio::NetworkDown;
-use r1_funcore::openai::chat::answer::{Answer, End, Event, parse_event};
-use r1_funcore::openai::chat::turn::{Retry, SocketThread, decide_retry};
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::models::{TIMEOUT, Task, chat};
+use r1_funcore::mistral::chat::answer::{Answer, End, Event, parse_event};
+use r1_funcore::mistral::chat::turn::{Retry, SocketThread, decide_retry};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::models::{TIMEOUT, Task, chat};
 use std::collections::VecDeque;
 use std::io;
 use std::time::Instant;
 
 type TurnRequest<'a> = (&'a str, &'a [&'a str], &'a str);
 
-/// The conversation's requests to OpenAI in one stay in the network.
+/// The conversation's requests to Mistral in one stay in the network.
 pub struct Conversation {
     account: Account,
     down: NetworkDown,
@@ -28,7 +28,7 @@ impl Conversation {
     /// Opens the turns' WebSocket, so that a turn waits for no handshake once a recorded message is handed over.
     pub fn prepare(&mut self) {
         if let Err(reason) = self.socket() {
-            log!("openai: the conversation's WebSocket is not opened ahead: {reason}");
+            log!("mistral: the conversation's WebSocket is not opened ahead: {reason}");
         }
     }
 
@@ -93,7 +93,7 @@ impl TurnSocket {
                 Ok(Incoming::Nothing) => return true,
                 Ok(Incoming::Closed) => return false,
                 Err(e) => {
-                    log!("openai: the conversation's WebSocket is not read before a turn: {e}");
+                    log!("mistral: the conversation's WebSocket is not read before a turn: {e}");
                     return false;
                 }
             }
@@ -132,7 +132,7 @@ impl TurnSocket {
             let (message, is_continued, start) = self.thread.next_turn(request, thinking, is_full_thread);
             // A socket the service closed while it lay idle is found so before the request goes, which nothing of the turn has reached.
             let is_sent = self.is_open()
-                && self.session.send(&message).inspect_err(|e| log!("openai: a turn is not sent: {e}")).is_ok();
+                && self.session.send(&message).inspect_err(|e| log!("mistral: a turn is not sent: {e}")).is_ok();
             if !is_sent {
                 return Err(self.spend(Fault::Temporary(SOCKET_FAILED.into())));
             }
@@ -198,8 +198,8 @@ fn book_answer(
 mod tests {
     use super::*;
     use crate::net::served::{Peer, peer};
-    use r1_funcore::openai::chat::request::{function_output, user_message};
-    use r1_funcore::openai::request::parse_target;
+    use r1_funcore::mistral::chat::request::{function_output, user_message};
+    use r1_funcore::mistral::request::parse_target;
     use std::io::Write;
     use std::thread::JoinHandle;
 
@@ -239,7 +239,7 @@ mod tests {
     }
 
     fn account() -> Account {
-        crate::openai::tests::unusable()
+        crate::mistral::tests::unusable()
     }
 
     #[test]
@@ -380,13 +380,13 @@ mod tests {
     #[test]
     #[ignore]
     fn service_caches_turns_12_hours() {
-        use crate::openai::Key;
+        use crate::mistral::Key;
         use r1_funcore::domain::chat::memory::Memory;
         use r1_funcore::domain::chat::tools::functions;
         use r1_funcore::domain::settings::Tools;
-        use r1_funcore::openai::chat::request::build_tools;
-        use r1_funcore::openai::key;
-        let secret = std::env::var("OPENAI_API_KEY").expect("a key in OPENAI_API_KEY");
+        use r1_funcore::mistral::chat::request::build_tools;
+        use r1_funcore::mistral::key;
+        let secret = std::env::var("MISTRAL_API_KEY").expect("a key in MISTRAL_API_KEY");
         let (account, down) = (account(), crate::wifi::radio::tests::up());
         let open = || {
             let key = Key { bearer: key::to_bearer(&secret), account: account.clone() };

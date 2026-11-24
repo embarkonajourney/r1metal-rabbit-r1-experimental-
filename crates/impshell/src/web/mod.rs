@@ -1,6 +1,6 @@
 use crate::log;
 use crate::net::web;
-use crate::openai::{Account, write};
+use crate::mistral::{Account, write};
 use crate::storage::Data;
 use crate::timekeeper::read_location;
 use crate::voiced::{Part, Shared, Worker};
@@ -12,8 +12,8 @@ use r1_funcore::domain::web::visit::{Outcome, Step, Visit};
 use r1_funcore::domain::web::{HEADERS, check_head};
 use r1_funcore::net::fetch::Fetched;
 use r1_funcore::net::tls::Purpose;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::transcript::Subject;
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::transcript::Subject;
 use std::ffi::CStr;
 use std::io;
 use std::time::Instant;

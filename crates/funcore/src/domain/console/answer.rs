@@ -5,7 +5,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 
 const PONG: &str = "pong";
-/// The answer to `key` where an OpenAI key is stored.
+/// The answer to `key` where an Mistral key is stored.
 pub const KEY_STORED: &str = "kept";
 const NO_KEY: &str = "none";
 

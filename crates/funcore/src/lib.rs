@@ -18,7 +18,7 @@ pub mod hw;
 pub mod input;
 pub mod logs;
 pub mod net;
-pub mod openai;
+pub mod mistral;
 pub mod signal;
 pub mod storage;
 pub mod ui;

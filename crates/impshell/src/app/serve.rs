@@ -16,7 +16,7 @@ use r1_funcore::hw::power::doze::CABLE_LINE;
 use r1_funcore::hw::uevent::Uevent;
 use r1_funcore::input::pose::{to_held_line, to_picked_up_line};
 use r1_funcore::input::to_added_line;
-use r1_funcore::openai::ledger::SummaryKind;
+use r1_funcore::mistral::ledger::SummaryKind;
 use r1_funcore::storage::safe::THRICE_WRONG_LINE;
 use r1_funcore::ui::{Action, Reading, Ui};
 use std::mem;

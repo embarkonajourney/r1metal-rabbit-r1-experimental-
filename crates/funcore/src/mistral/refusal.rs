@@ -1,4 +1,4 @@
-//! The refusals of OpenAI's services and their log text.
+//! The refusals of Mistral's services and their log text.
 
 use crate::base::json::text_at;
 use crate::base::json::unescape;
@@ -45,8 +45,13 @@ impl Refusal {
     }
 }
 
-/// The refusal of an answer, if it is one: an object with its code and words, or words alone, as the refusal of a key that lacks a permission comes.
+/// The refusal of an answer, if it is one: Mistral's message with its code beside it, or OpenAI's object with its code and words, or words alone, as the refusal of a key that lacks a permission comes.
 pub fn parse_refusal(document: &str) -> Option<Refusal> {
+    if let Some(message) = text_at(document, &["message"]).filter(|message| !message.is_empty()) {
+        // Mistral's refusals: a message, with a code where one is told.
+        let code = text_at(document, &["code"]).or_else(|| text_at(document, &["type"])).map(unescape).unwrap_or_default();
+        return Some(Refusal { code, message: unescape(message) });
+    }
     let error = value_at(document, &["error"])?;
     if error.starts_with('"') {
         let message = text_at(document, &["error"]).map(unescape).unwrap_or_default();
@@ -64,10 +69,6 @@ pub fn session_status(message: &str, ready: &str) -> Option<Result<(), Refusal>>
     }
 }
 
-pub(super) fn parse_refusal_bytes(body: &[u8]) -> Option<Refusal> {
-    core::str::from_utf8(body).ok().and_then(parse_refusal)
-}
-
 pub(super) fn parse_document(body: &[u8]) -> Result<&str, Option<Refusal>> {
     let document = core::str::from_utf8(body).map_err(|_| None)?;
     parse_refusal(document).map_or(Ok(document), |refusal| Err(Some(refusal)))
@@ -76,7 +77,7 @@ pub(super) fn parse_document(body: &[u8]) -> Result<&str, Option<Refusal>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::{aloud, live};
+    use crate::mistral::{aloud, live};
 
     #[test]
     fn parsed_refusals() {

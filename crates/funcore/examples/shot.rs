@@ -49,7 +49,7 @@ use r1_funcore::hw::power::usage::Usage;
 use r1_funcore::input::Event;
 use r1_funcore::input::pose::G;
 use r1_funcore::logs::writer;
-use r1_funcore::openai::ledger::Ledger;
+use r1_funcore::mistral::ledger::Ledger;
 use r1_funcore::signal::address::{Peer, ServiceId};
 use r1_funcore::signal::call::Kind as CallKind;
 use r1_funcore::signal::conversation::{Entry as Message, Reaction as MessageReaction, Status};

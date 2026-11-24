@@ -1,5 +1,5 @@
 use super::{Robot, files, read};
-use crate::openai::chat::Conversation;
+use crate::mistral::chat::Conversation;
 use crate::voiced::{ChoreRunner, ReadyCheck, Shared, Worker};
 use crate::wifi::radio::{Hold, NetworkDown};
 use crate::{clock, log, sys, timekeeper};
@@ -16,10 +16,10 @@ use r1_funcore::domain::chat::{InputKind, MET_LINE, ONBOARDING_ANSWER, message, 
 use r1_funcore::domain::settings::{Settings, Tool};
 use r1_funcore::domain::signal::robot::Reply as Answered;
 use r1_funcore::domain::voice::{Phase, Query};
-use r1_funcore::openai::chat::answer::{Answer, Call};
-use r1_funcore::openai::chat::request::{Location, build_tools, function_output, user_message};
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::transcript::Subject;
+use r1_funcore::mistral::chat::answer::{Answer, Call};
+use r1_funcore::mistral::chat::request::{Location, build_tools, function_output, user_message};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::transcript::Subject;
 use std::ffi::CStr;
 
 impl Worker for Robot {

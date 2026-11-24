@@ -1,7 +1,7 @@
 //! What the data partition holds for the parts above storage.
 
 use super::uses;
-use crate::openai::key;
+use crate::mistral::key;
 use crate::signal::device;
 use crate::storage::CHAT_PRIVATE;
 

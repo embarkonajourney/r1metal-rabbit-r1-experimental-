@@ -3,7 +3,7 @@
 use crate::base::handoff::{Orders, Turns};
 use crate::domain::cause::Cause;
 use crate::net::race::TIMEOUT;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

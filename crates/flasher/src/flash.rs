@@ -1,4 +1,4 @@
-//! The flash: the R1 brought into fastboot from whatever it runs, whether it erases user data decided once and the OpenAI key asked for where that leaves the R1 without one, unlocked, the images written to its slots and the slot to boot chosen; and `stock`, which writes Rabbit's firmware back the same way.
+//! The flash: the R1 brought into fastboot from whatever it runs, whether it erases user data decided once and the Mistral key asked for where that leaves the R1 without one, unlocked, the images written to its slots and the slot to boot chosen; and `stock`, which writes Rabbit's firmware back the same way.
 
 use crate::build::Unflashed;
 use crate::link::console::Console;
@@ -162,7 +162,7 @@ fn unlock(fb: &mut Fastboot<impl Transport>, allowed: Option<bool>) -> Result<()
     Ok(())
 }
 
-// Whether a flash asks for an OpenAI key: where it erases user data, as an unlock of a `locked` bootloader or `wipe` does, or where the R1 has not said it keeps one.
+// Whether a flash asks for an Mistral key: where it erases user data, as an unlock of a `locked` bootloader or `wipe` does, or where the R1 has not said it keeps one.
 fn asks_key(wipe: bool, locked: bool, kept: bool) -> bool {
     locked || wipe || !kept
 }
@@ -228,7 +228,7 @@ fn activate_and_reboot(fb: &mut Fastboot<impl Transport>, known: bool, slots: &[
     }
 }
 
-/// Writes r1metal to the chosen R1 and boots it: the boot image `unflashed` with the file of this flash, which holds `logging` and the OpenAI key, and the overlays LK lays over its device tree, behind a vbmeta that checks neither. Whether user data is erased, where the bootloader is to be unlocked or `wipe` asks, is decided once before anything is written, an R1 whose bootloader may not be unlocked is refused then, and the key is asked for where that erases the one the R1 keeps or it keeps none (`asks_key`).
+/// Writes r1metal to the chosen R1 and boots it: the boot image `unflashed` with the file of this flash, which holds `logging` and the Mistral key, and the overlays LK lays over its device tree, behind a vbmeta that checks neither. Whether user data is erased, where the bootloader is to be unlocked or `wipe` asks, is decided once before anything is written, an R1 whose bootloader may not be unlocked is refused then, and the key is asked for where that erases the one the R1 keeps or it keeps none (`asks_key`).
 pub fn flash(
     choice: &Choice,
     unflashed: Unflashed,
@@ -247,12 +247,12 @@ pub fn flash(
     let key = if asks_key(wipe, locked, kept) {
         key::for_flash()?
     } else {
-        eprintln!("the R1 runs r1metal and keeps an OpenAI key, which the flash leaves as it is");
+        eprintln!("the R1 runs r1metal and keeps an Mistral key, which the flash leaves as it is");
         None
     };
     // Every flash has a stamp of its own, the seconds of its moment; the device takes its choice once.
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs();
-    let given = if key.is_some() { "an OpenAI key OpenAI takes" } else { "no OpenAI key" };
+    let given = if key.is_some() { "an Mistral key Mistral takes" } else { "no Mistral key" };
     let boot = unflashed.flashed(&Flash { stamp, logging, key })?;
     eprintln!("logging {}, {given}", logging.to_word());
     if locked {

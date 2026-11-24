@@ -4,9 +4,9 @@ use super::backlog::{Backlog, Holder};
 use super::cause::Cause;
 use crate::base::time::{NANOS_PER_SECOND, SECONDS_PER_MINUTE};
 use crate::hw::camera::develop;
-use crate::openai::fault::Fault;
-use crate::openai::models::image;
-use crate::openai::request::Step;
+use crate::mistral::fault::Fault;
+use crate::mistral::models::image;
+use crate::mistral::request::Step;
 use crate::storage::{Files, PICTURE_EXTENSION, PICTURES};
 use alloc::format;
 use alloc::string::String;
@@ -404,8 +404,8 @@ impl State {
 mod tests {
     use super::*;
     use crate::domain::backlog::Status;
-    use crate::openai::models::TIMEOUT;
-    use crate::openai::models::image::SIDE;
+    use crate::mistral::models::TIMEOUT;
+    use crate::mistral::models::image::SIDE;
     use crate::storage::tests::{Disk, Refused};
     use alloc::vec;
 
@@ -618,7 +618,7 @@ mod tests {
         assert_eq!(
             reasons().map(|reason| to_failure_line("p", &reason, &timings)),
             [
-                String::from("magic: p: no key to the services in .r1metal/openai/key"),
+                String::from("magic: p: no key to the services in .r1metal/mistral/key"),
                 format!("magic: p: not redrawn this time: not in a network: asleep; {times}"),
                 format!("magic: p: not redrawn and not asked for again, no; {times}"),
                 format!("magic: p: not redrawn this time: x; {times}")

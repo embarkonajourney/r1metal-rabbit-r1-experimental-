@@ -6,7 +6,7 @@ use crate::domain::cause::Cause;
 use crate::domain::voice::{Job, Keep, Phase, Query, Voice};
 use crate::gfx::Picture;
 use crate::gfx::palette::Roles;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use core::convert::Infallible;
 
 /// A lookup's result: the entry, and its artwork where that was drawn.

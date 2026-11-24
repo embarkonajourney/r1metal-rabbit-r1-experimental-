@@ -1,7 +1,7 @@
 //! A rundown's stories and their report for the model.
 
 use super::feed::Feed;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

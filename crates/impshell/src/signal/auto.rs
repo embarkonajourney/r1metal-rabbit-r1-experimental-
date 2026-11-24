@@ -1,5 +1,5 @@
 use super::Shared;
-use crate::openai::{Account, write};
+use crate::mistral::{Account, write};
 use crate::{log, sys};
 use r1_funcore::domain::signal::state::State;
 

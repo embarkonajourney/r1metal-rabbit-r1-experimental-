@@ -1,11 +1,11 @@
 use crate::log;
-use crate::openai::{Account, transcript};
+use crate::mistral::{Account, transcript};
 use crate::voiced::{Part, Shared, Worker};
 use crate::wifi::radio::{Hold, NetworkDown};
 use r1_funcore::domain::signal::drafts::{Draft, Recording};
 use r1_funcore::domain::voice::Phase;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::transcript::Subject;
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::transcript::Subject;
 use r1_funcore::signal::DRAFT_THREADS;
 use std::ffi::CStr;
 use std::io;

@@ -1,4 +1,4 @@
-//! A line asked for at the terminal without being shown as it is typed: an OpenAI key, a passphrase.
+//! A line asked for at the terminal without being shown as it is typed: an Mistral key, a passphrase.
 
 use crate::Result;
 use crate::interrupt::{self, Taken};

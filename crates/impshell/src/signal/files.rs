@@ -1,9 +1,9 @@
 use crate::log;
-use crate::openai::Account;
+use crate::mistral::Account;
 use crate::storage::settings::Uses;
 use crate::storage::{Data, logs};
 use r1_funcore::domain::uses::SIGNAL_USE;
-use r1_funcore::openai::ledger;
+use r1_funcore::mistral::ledger;
 use r1_funcore::signal::attachment::{ATTACHMENTS, unheld};
 use r1_funcore::signal::device::{DIRECTORY, Device, FOLDERS, File, LinkState, to_removed, to_unforgotten_line};
 use r1_funcore::storage::paths::{Listed, split_folder};
@@ -99,8 +99,8 @@ mod tests {
     use crate::storage::scratch;
     use crate::wifi::radio::tests::without_networks;
     use r1_funcore::domain::uses;
-    use r1_funcore::openai::key;
-    use r1_funcore::openai::ledger::{Entry, Kind, Ledger};
+    use r1_funcore::mistral::key;
+    use r1_funcore::mistral::ledger::{Entry, Kind, Ledger};
     use r1_funcore::signal::device::{CONVERSATIONS, SENDER_KEYS, SESSIONS};
     use std::fs;
     use std::path::Path;

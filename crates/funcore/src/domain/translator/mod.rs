@@ -6,7 +6,7 @@ pub mod state;
 use crate::codec::aac;
 use crate::hw::sound::record::Settle;
 use crate::hw::sound::{PEAK_FLOOR, peak, to_span};
-use crate::openai::models::interpreter;
+use crate::mistral::models::interpreter;
 use alloc::collections::VecDeque;
 use core::iter::repeat_n;
 use core::time::Duration;

@@ -20,7 +20,7 @@ use r1_funcore::hw::camera::exposure::Still;
 use r1_funcore::hw::camera::raw::Square;
 use r1_funcore::hw::camera::sharpen::Sharpener;
 use r1_funcore::hw::{CORES, PARTS};
-use r1_funcore::openai::models::image;
+use r1_funcore::mistral::models::image;
 use r1_funcore::storage::{PICTURE_EXTENSION, PICTURES};
 use std::io;
 use std::time::{Duration, Instant};

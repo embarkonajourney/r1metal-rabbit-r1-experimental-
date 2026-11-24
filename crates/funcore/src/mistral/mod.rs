@@ -1,4 +1,4 @@
-//! Requests to OpenAI's services and their answers.
+//! Requests to Mistral's services and their answers.
 
 pub mod account;
 pub mod aloud;

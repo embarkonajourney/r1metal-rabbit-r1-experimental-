@@ -1,4 +1,4 @@
-//! The models and addresses of OpenAI's services, with their parameters and time limits, and the language model and effort a use is set to.
+//! The models and addresses of Mistral's services, with their parameters and time limits, and the language model and effort a use is set to.
 
 use core::time::Duration;
 
@@ -153,12 +153,12 @@ pub const TIMEOUT: Duration = Duration::from_secs(120);
 /// The model list, where a key proves itself.
 pub mod check {
     /// Listing the models costs nothing.
-    pub const ADDRESS: &str = "https://api.openai.com/v1/models";
+    pub const ADDRESS: &str = "https://api.mistral.ai/v1/models";
 }
 
 /// The image model that redraws a photo as pixel art.
 pub mod image {
-    pub const ADDRESS: &str = "https://api.openai.com/v1/images/edits";
+    pub const ADDRESS: &str = "https://api.mistral.ai/v1/images/edits";
     pub(crate) const MODEL: &str = "gpt-image-2.5-flare";
     pub(crate) const QUALITY: &str = "medium";
     /// The pixels along a side of the picture both ways: both are paid for by their size.
@@ -169,14 +169,14 @@ pub mod image {
 
 /// The speech model that writes a recording's words down.
 pub mod transcriber {
-    pub const ADDRESS: &str = "https://api.openai.com/v1/audio/transcriptions";
-    pub(crate) const MODEL: &str = "gpt-transcribe";
+    pub const ADDRESS: &str = "https://api.mistral.ai/v1/audio/transcriptions";
+    pub(crate) const MODEL: &str = "voxtral-mini-transcribe-3";
 }
 
 /// The language model's background work, whatever use asks for it.
 pub mod writer {
     /// Pending work is asked after at this address with its id behind it.
-    pub const ADDRESS: &str = "https://api.openai.com/v1/responses";
+    pub const ADDRESS: &str = "https://api.mistral.ai/v1/responses";
     pub(crate) const VERBOSITY: &str = "low";
 }
 
@@ -185,7 +185,7 @@ pub mod chat {
     use crate::base::time::SECONDS_PER_HOUR;
 
     /// The Responses API's WebSocket mode.
-    pub const ADDRESS: &str = "wss://api.openai.com/v1/responses";
+    pub const ADDRESS: &str = "wss://api.mistral.ai/v1/responses";
     pub(crate) const SEARCH_CONTEXT: &str = "high";
     pub(crate) const SEARCH_BUDGET: &str = "unlimited";
     pub(crate) const COMPACT_THRESHOLD: u64 = 200_000;
@@ -197,7 +197,7 @@ pub mod chat {
 
 /// The translator's live model.
 pub mod interpreter {
-    pub const ADDRESS: &str = "wss://api.openai.com/v1/live/sessions";
+    pub const ADDRESS: &str = "wss://api.mistral.ai/v1/live/sessions";
     pub(crate) const MODEL: &str = "gpt-live-1";
     /// The limit on the service's word that a session stands.
     pub const TIMEOUT: super::Duration = super::Duration::from_secs(15);
@@ -208,7 +208,7 @@ pub mod interpreter {
 /// The realtime model that reads a text aloud.
 pub mod reader {
     /// The address names the model.
-    pub const ADDRESS: &str = "wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1-mini";
+    pub const ADDRESS: &str = "wss://api.mistral.ai/v1/realtime?model=gpt-realtime-2.1-mini";
     /// The limit on the session's setup and on each piece of an answer after that.
     pub const TIMEOUT: super::Duration = super::Duration::from_secs(15);
     pub(crate) const EFFORT: &str = "minimal";

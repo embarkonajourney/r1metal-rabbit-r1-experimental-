@@ -19,7 +19,7 @@ use crate::domain::scene::shelf_names;
 use crate::domain::scribe::state::Report as ScribeReport;
 use crate::domain::shelf::Shelf;
 use crate::domain::uses::Use;
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 use crate::signal::attachment::Enclosure;
 use crate::ui::Ui;
 use crate::ui::grid::Grid;
@@ -532,7 +532,7 @@ impl Ui {
                 Item::new(STOP, "AND KEEP THE NOTE").with_recording().with_aside(Aside::Meter)
             }
             (None, Shelf::Notes) => Item::new("RECORD", "A NEW NOTE").with_recording(),
-            (None, Shelf::Talks) => Item::lead("TRANSLATE", "A NEW CONVERSATION, BY OPENAI").with_icon(TRANSLATE_ICON),
+            (None, Shelf::Talks) => Item::lead("TRANSLATE", "A NEW CONVERSATION, BY MISTRAL").with_icon(TRANSLATE_ICON),
             (None, Shelf::News | Shelf::Facts | Shelf::Days) => return None,
             (Some(at), _) => self.entry_item(self.memos.entries.as_ref()?.get(at)?),
         })

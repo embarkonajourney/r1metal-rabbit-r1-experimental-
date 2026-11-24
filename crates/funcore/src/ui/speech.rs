@@ -3,7 +3,7 @@ use alloc::string::String;
 use core::fmt::Write;
 
 const ACRONYMS: [&str; 10] = ["UTC", "MB", "MAH", "MA", "MV", "GIB", "CPU", "RAM", "IMEI", "PDF"];
-const RESPELLINGS: [(&str, &str); 2] = [("WIFI", "WiFi"), ("OPENAI", "OpenAI")];
+const RESPELLINGS: [(&str, &str); 2] = [("WIFI", "WiFi"), ("MISTRAL", "Mistral")];
 const SENTENCE_ENDS: [char; 3] = ['.', '?', '!'];
 const ELLIPSIS: char = '\u{2026}';
 const PARTICLES: [&str; 6] = ["UP", "OFF", "ON", "OUT", "IN", "DOWN"];
@@ -109,7 +109,7 @@ mod tests {
             ("SAVING THE NOTE", "Saving the note.".into(), "nor does what more than a particle follows"),
             ("WIFI OFF", "WiFi off.".into(), "a name keeps its own spelling"),
             ("12 MB", "12 MB.".into(), "a number and a unit stay as they are"),
-            ("NO OPENAI KEY", "No OpenAI key.".into(), "a name inside a sentence"),
+            ("NO MISTRAL KEY", "No Mistral key.".into(), "a name inside a sentence"),
             ("DONE. NEXT ONE", "Done. Next one.".into(), "each sentence begins with a capital"),
             ("READY?", "Ready?".into(), "what ends in a mark gets no other"),
             ("A", "A.".into(), "a single letter stays a capital"),

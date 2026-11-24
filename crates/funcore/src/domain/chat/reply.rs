@@ -4,8 +4,8 @@ use super::calls::continues_turn;
 use super::passage::Passages;
 use super::tools::{Act, ToolCall};
 use super::transcript::{Entry, EntryKind};
-use crate::openai::chat::answer::{Answer, Call, Event};
-use crate::openai::output::strip_citations;
+use crate::mistral::chat::answer::{Answer, Call, Event};
+use crate::mistral::output::strip_citations;
 use alloc::string::String;
 use alloc::vec::Vec;
 

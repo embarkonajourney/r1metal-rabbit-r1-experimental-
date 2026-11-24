@@ -299,7 +299,7 @@ impl Command {
             "chat" => path().map(Command::Chat),
             "record" => next_switch(rest).map(Command::Record),
             "key" if rest.is_empty() => Ok(Command::Key(None)),
-            "key" => crate::openai::key::parse_key(rest)
+            "key" => crate::mistral::key::parse_key(rest)
                 .map(|key| Command::Key(Some(key.to_string())))
                 .ok_or(ParseError::UnexpectedArgument),
             "log" if rest.is_empty() => Err(ParseError::MissingArgument),

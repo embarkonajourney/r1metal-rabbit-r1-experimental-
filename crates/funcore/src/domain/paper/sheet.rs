@@ -5,8 +5,8 @@ use super::names::{rundown_file, sound_file, words_file};
 use crate::base::text::to_one_line;
 use crate::base::time::to_duration_text;
 use crate::domain::dialogue::Turn;
-use crate::openai::ledger::SummaryKind;
-use crate::openai::models::{Model, interpreter, transcriber};
+use crate::mistral::ledger::SummaryKind;
+use crate::mistral::models::{Model, interpreter, transcriber};
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -111,7 +111,7 @@ fn to_paragraphs(words: &str) -> String {
 
 pub(crate) fn to_words_file(stem: &str, seconds: u64, words: &str) -> String {
     format!(
-        "# Note of {}\n\nTranscript of `{}` ({}), written down by OpenAI's `{}`.\n{HEAD_END}\n{}\n",
+        "# Note of {}\n\nTranscript of `{}` ({}), written down by Mistral's `{}`.\n{HEAD_END}\n{}\n",
         to_sentence_date(stem),
         sound_file(stem),
         to_duration_text(seconds),
@@ -133,7 +133,7 @@ fn to_remark_lines(turn: &Turn) -> String {
 /// The Markdown file of a conversation.
 pub fn to_remarks_file(stem: &str, seconds: u64, turns: &[Turn]) -> String {
     let head = format!(
-        "# Conversation of {}\n\nA conversation of {} as OpenAI's `{}` heard and translated it: each remark as it was spoken, and under it as the translator said it to the other.\n{HEAD_END}\n",
+        "# Conversation of {}\n\nA conversation of {} as Mistral's `{}` heard and translated it: each remark as it was spoken, and under it as the translator said it to the other.\n{HEAD_END}\n",
         to_sentence_date(stem),
         to_duration_text(seconds),
         interpreter::MODEL
@@ -146,19 +146,19 @@ pub fn to_summary_file(subject: Subject<'_>, text: &str, model: Model) -> String
     let model = model.to_word();
     let head = match subject {
         Subject::Rundown(day, topic, sources) => format!(
-            "# {}\n\nThe day's rundown, written by OpenAI's `{model}` from what the feeds told that morning. {}.",
+            "# {}\n\nThe day's rundown, written by Mistral's `{model}` from what the feeds told that morning. {}.",
             to_rundown_heading(day, topic),
             sources.trim().trim_end_matches('.')
         ),
         Subject::Note(stem, seconds) => format!(
-            "# Note of {}\n\nSummary of `{}` ({}), made by OpenAI's `{model}` from its [transcript]({}).",
+            "# Note of {}\n\nSummary of `{}` ({}), made by Mistral's `{model}` from its [transcript]({}).",
             to_sentence_date(stem),
             sound_file(stem),
             to_duration_text(seconds),
             words_file(SummaryKind::Note, stem)
         ),
         Subject::Talk(stem) => format!(
-            "# Conversation of {}\n\nSummary, in both of its languages, of the [conversation]({}) the translator rendered, made by OpenAI's `{model}`.",
+            "# Conversation of {}\n\nSummary, in both of its languages, of the [conversation]({}) the translator rendered, made by Mistral's `{model}`.",
             to_sentence_date(stem),
             words_file(SummaryKind::Talk, stem)
         ),
@@ -189,12 +189,12 @@ mod tests {
         let file = to_words_file(STEM, 42, " Buy milk. And call Anna. ");
         assert_eq!(
             file,
-            "# Note of 12 October 2026, 19:03\n\nTranscript of `20261012_190328.m4a` (0:42), written down by OpenAI's `gpt-transcribe`.\n\n---\n\nBuy milk. And call Anna.\n"
+            "# Note of 12 October 2026, 19:03\n\nTranscript of `20261012_190328.m4a` (0:42), written down by Mistral's `voxtral-mini-transcribe-3`.\n\n---\n\nBuy milk. And call Anna.\n"
         );
         assert_eq!(body(&file), "Buy milk. And call Anna.");
         let summary = to_summary_file(NOTE, "Shopping.\n\n## To do\n\n- **Anna**: call\n\n---\n\nEnd\n", Model::Luna);
         assert!(summary.starts_with(
-            "# Note of 12 October 2026, 19:03\n\nSummary of `20261012_190328.m4a` (0:42), made by OpenAI's `gpt-6-luna` from its [transcript](20261012_190328_transcript.md).\n\n---\n\nShopping."
+            "# Note of 12 October 2026, 19:03\n\nSummary of `20261012_190328.m4a` (0:42), made by Mistral's `gpt-6-luna` from its [transcript](20261012_190328_transcript.md).\n\n---\n\nShopping."
         ));
         assert_eq!(body(&summary), "Shopping.\n\n## To do\n\n- **Anna**: call\n\n---\n\nEnd");
         assert_eq!((body("no head at all\n"), body("")), ("no head at all", ""));
@@ -213,7 +213,7 @@ mod tests {
         let file = to_remarks_file(STEM, 95, &turns);
         assert_eq!(
             file,
-            "# Conversation of 12 October 2026, 19:03\n\nA conversation of 1:35 as OpenAI's `gpt-live-1` heard and translated it: each remark as it was spoken, and under it as the translator said it to the other.\n\n---\n\n- **Translator:** Hello, I am the translator.\n- Wo ist der Bahnhof?\n  - Where is the station?\n- Over there.\n"
+            "# Conversation of 12 October 2026, 19:03\n\nA conversation of 1:35 as Mistral's `gpt-live-1` heard and translated it: each remark as it was spoken, and under it as the translator said it to the other.\n\n---\n\n- **Translator:** Hello, I am the translator.\n- Wo ist der Bahnhof?\n  - Where is the station?\n- Over there.\n"
         );
         let summary = to_summary_file(
             TALK,
@@ -222,7 +222,7 @@ mod tests {
         );
         assert!(
             summary.starts_with(
-                "# Conversation of 12 October 2026, 19:03\n\nSummary, in both of its languages, of the [conversation](20261012_190328_conversation.md) the translator rendered, made by OpenAI's `gpt-6.1-terra`.\n\n---\n\n## Deutsch"
+                "# Conversation of 12 October 2026, 19:03\n\nSummary, in both of its languages, of the [conversation](20261012_190328_conversation.md) the translator rendered, made by Mistral's `gpt-6.1-terra`.\n\n---\n\n## Deutsch"
             ),
             "the model that wrote it"
         );
@@ -262,7 +262,7 @@ mod tests {
         );
         assert_eq!(
             file,
-            "# Finance of 13 October 2026\n\nThe day's rundown, written by OpenAI's `gpt-6-luna` from what the feeds told that morning. Sources (2/3 feeds, 9 stories): a.com, b.org.\n\n---\n\n## Markets\n\n**Stocks** fell.\n"
+            "# Finance of 13 October 2026\n\nThe day's rundown, written by Mistral's `gpt-6-luna` from what the feeds told that morning. Sources (2/3 feeds, 9 stories): a.com, b.org.\n\n---\n\n## Markets\n\n**Stocks** fell.\n"
         );
         let news = Subject::Rundown(DAY, "news", SOURCES);
         assert_eq!(

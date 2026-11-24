@@ -8,7 +8,7 @@ use crate::base::text::{to_one_line, words};
 use crate::base::time::stamp::{parse_compact_day, parse_stamp};
 use crate::domain::memos::{read_summary, read_words};
 use crate::domain::paper::names::directory;
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 use crate::storage::Files;
 use crate::storage::paths::Listed;
 use alloc::format;

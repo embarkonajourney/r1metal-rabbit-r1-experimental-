@@ -15,7 +15,7 @@ use r1_funcore::cell::link::{Routed, to_unrouted_text};
 use r1_funcore::cell::modem;
 use r1_funcore::net::dhcp::Leases;
 use r1_funcore::net::dns::nat64::Search;
-use r1_funcore::openai::fault::Fault;
+use r1_funcore::mistral::fault::Fault;
 use r1_funcore::wifi::credential::Cache;
 use r1_funcore::wifi::join::{Purpose, StayEnd};
 use r1_funcore::wifi::known::Change;

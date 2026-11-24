@@ -10,7 +10,7 @@ use r1_funcore::base::handoff::Step;
 use r1_funcore::domain::clock::{HoldCheck, HoldStep, Report, StayCheck, TimeAnswer, to_time_line};
 use r1_funcore::domain::place::{self, LOCATION_FILE, OFFSET_FILE};
 use r1_funcore::net::sntp;
-use r1_funcore::openai::chat::request::Location;
+use r1_funcore::mistral::chat::request::Location;
 use std::io;
 use std::os::fd::RawFd;
 use std::sync::Arc;

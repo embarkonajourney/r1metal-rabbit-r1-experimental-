@@ -3,7 +3,7 @@
 use super::{Bell, Change, parse_reply};
 use crate::domain::cause::Cause;
 use crate::domain::voice::{Changes, Request, Voice};
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::string::String;
 
 /// The transcriber's prompt for a request said.

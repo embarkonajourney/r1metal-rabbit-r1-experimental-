@@ -125,8 +125,8 @@ mod tests {
     #[test]
     fn web_line() {
         assert_eq!(
-            to_web_line("api.openai.com", 3, "[2606:4700::6812:1a78]:443", 41, "TLS 1.3", 95),
-            "web: api.openai.com named in 3 ms, reached at [2606:4700::6812:1a78]:443 after 41 ms, TLS 1.3 after 95 ms"
+            to_web_line("api.mistral.ai", 3, "[2606:4700::6812:1a78]:443", 41, "TLS 1.3", 95),
+            "web: api.mistral.ai named in 3 ms, reached at [2606:4700::6812:1a78]:443 after 41 ms, TLS 1.3 after 95 ms"
         );
     }
 

@@ -74,7 +74,7 @@ mod tests {
     #[test]
     fn fault_kinds() {
         let table = [
-            (Fault::NoKey, (true, true), "no key to the services in .r1metal/openai/key"),
+            (Fault::NoKey, (true, true), "no key to the services in .r1metal/mistral/key"),
             (Fault::Limit, (true, true), "the month's spending limit is reached"),
             (Fault::Offline("asleep".into()), (true, false), "not in a network: asleep"),
             (Fault::Refused("no".into()), (false, true), "refused: no"),

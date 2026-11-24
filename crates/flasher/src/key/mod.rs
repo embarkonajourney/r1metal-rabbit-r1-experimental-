@@ -1,4 +1,4 @@
-//! The OpenAI key on this computer: asked for, pasted or typed without being shown, checked with OpenAI before it goes anywhere, then given to a flash, handed to a running R1, or shown as the QR code the R1's key window scans.
+//! The Mistral key on this computer: asked for, pasted or typed without being shown, checked with Mistral before it goes anywhere, then given to a flash, handed to a running R1, or shown as the QR code the R1's key window scans.
 
 mod check;
 mod terminal;
@@ -13,10 +13,10 @@ use r1_funcore::domain::console::command::Command;
 use r1_funcore::domain::console::wire::ReplyLine;
 
 // The questions asked before a flash and by `r1 key`.
-const FOR_FLASH: &str = "OpenAI key for the R1, pasted or typed, not shown (Enter flashes without one): ";
-const FOR_KEY: &str = "OpenAI key, pasted or typed, not shown: ";
+const FOR_FLASH: &str = "Mistral key for the R1, pasted or typed, not shown (Enter flashes without one): ";
+const FOR_KEY: &str = "Mistral key, pasted or typed, not shown: ";
 
-// A key asked for until one that OpenAI takes is given, or none is: an empty line, or the input's end. Where the input is no terminal its first line alone is taken, and one that does not work is an error.
+// A key asked for until one that Mistral takes is given, or none is: an empty line, or the input's end. Where the input is no terminal its first line alone is taken, and one that does not work is an error.
 fn asked(question: &str) -> Result<Option<String>> {
     prompt::ask(question, |given| {
         let Some(given) = given.filter(|given| !given.trim().is_empty()) else {
@@ -26,7 +26,7 @@ fn asked(question: &str) -> Result<Option<String>> {
             return Ok(Attempt::Refused(why.into()));
         }
         let key = given.trim().to_string();
-        eprintln!("OpenAI takes the key, {} characters", key.chars().count());
+        eprintln!("Mistral takes the key, {} characters", key.chars().count());
         Ok(Attempt::Taken(Some(key)))
     })
 }
@@ -53,7 +53,7 @@ pub fn set(choice: &Choice, qr: bool) -> Result<()> {
         let (code, side) = terminal::code(&key).ok_or("the key is too long for a QR code")?;
         terminal::room_for(side)?;
         print!("{code}");
-        eprintln!("on the R1: OPENAI KEY, SCAN QR CODE, and its camera to the code");
+        eprintln!("on the R1: MISTRAL KEY, SCAN QR CODE, and its camera to the code");
         return Ok(());
     }
     remote::running_console(choice)?.run(&Command::Key(Some(key)), remote::show)?;
@@ -65,7 +65,7 @@ pub fn set(choice: &Choice, qr: bool) -> Result<()> {
 mod tests {
     #[test]
     fn scan_command_shows_code() {
-        let parsed = crate::tests::parsed(r1_funcore::openai::key::SCAN_COMMAND);
+        let parsed = crate::tests::parsed(r1_funcore::mistral::key::SCAN_COMMAND);
         assert!(matches!(parsed, Some((_, crate::Task::Key { qr: true }))));
     }
 }

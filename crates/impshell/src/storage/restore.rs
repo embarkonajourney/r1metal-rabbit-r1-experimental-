@@ -164,7 +164,7 @@ mod tests {
         assert_eq!((found.is_staging, found.staged, found.has_private), (false, None, false), "an empty partition");
         tree(
             &root,
-            &[(".restore.new/camera/a.jpg", "a"), (".restore/chat/core.md", "c"), (".r1metal/openai/key", "k")],
+            &[(".restore.new/camera/a.jpg", "a"), (".restore/chat/core.md", "c"), (".r1metal/mistral/key", "k")],
         );
         fs::create_dir_all(root.join(".restore/replaced")).unwrap();
         let mut found = find(&root).unwrap();
@@ -185,7 +185,7 @@ mod tests {
             &[
                 ("camera/pictures/old.jpg", "old"),
                 ("chat/core.md", "stays"),
-                (".r1metal/openai/key", "own"),
+                (".r1metal/mistral/key", "own"),
                 (".restore/camera/videos/new.mp4", "new"),
                 (".restore/stray/x", "x"),
                 (".restore.new/chat/core.md", "never confirmed"),
@@ -198,7 +198,7 @@ mod tests {
         apply(&root).unwrap();
         assert_eq!(
             lines(&root),
-            [".r1metal/openai/key own", "camera/videos/new.mp4 new", "chat/core.md stays"],
+            [".r1metal/mistral/key own", "camera/videos/new.mp4 new", "chat/core.md stays"],
             "a root the restore holds takes its root's place whole, one it holds none of stays, and a name no backup holds goes"
         );
         apply(&root).unwrap();

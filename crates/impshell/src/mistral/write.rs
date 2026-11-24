@@ -9,12 +9,12 @@ use r1_funcore::domain::news::request;
 use r1_funcore::domain::news::stories::to_input;
 use r1_funcore::domain::paper::sheet::summary_task;
 use r1_funcore::domain::web;
-use r1_funcore::openai::chat::request::Location;
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::ledger::{Entry, SummaryKind};
-use r1_funcore::openai::models::writer;
-use r1_funcore::openai::request::{JSON, parse_target};
-use r1_funcore::openai::summary::{
+use r1_funcore::mistral::chat::request::Location;
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::ledger::{Entry, SummaryKind};
+use r1_funcore::mistral::models::writer;
+use r1_funcore::mistral::request::{JSON, parse_target};
+use r1_funcore::mistral::summary::{
     self, Cost, Job, Poll, RESUMED_LINE, RUNDOWN, Summary, UNFINISHED, Watch, Work, WorkStatus, cancel_target,
     parse_poll, parse_status, poll_target, status_cost, to_asked_line,
 };
@@ -23,7 +23,7 @@ use std::time::{Duration, Instant};
 fn pause(down: Option<&NetworkDown>, duration: Duration) -> bool {
     let mut fds: Vec<_> = down.into_iter().map(|down| sys::readable(down.fd())).collect();
     let ready = sys::poll(&mut fds, Some(Instant::now() + duration));
-    ready.inspect_err(|e| log!("openai: waiting for background work: {e}")).is_ok_and(|ready| ready == 0)
+    ready.inspect_err(|e| log!("mistral: waiting for background work: {e}")).is_ok_and(|ready| ready == 0)
 }
 
 fn digest(request: &str) -> String {
@@ -226,7 +226,7 @@ mod tests {
     use crate::clock;
     use crate::wifi::radio::tests::{up, without_networks};
     use r1_funcore::base::time::Moment;
-    use r1_funcore::openai::ledger::Ledger;
+    use r1_funcore::mistral::ledger::Ledger;
 
     #[test]
     fn pause_ends_on_network_down() {
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn cost_booked_in_held_ledger() {
-        let account = crate::openai::tests::unusable();
+        let account = crate::mistral::tests::unusable();
         lock(&account.0.state).ledger.give(Some(Ledger::default()));
         let (now, entry) = (Moment::from_seconds(clock::local()), RUNDOWN.1);
         book(&account, None, entry);
@@ -269,7 +269,7 @@ mod tests {
 
     #[test]
     fn no_key_no_request() {
-        let (account, down, mut slot) = (crate::openai::tests::unusable(), up(), None);
+        let (account, down, mut slot) = (crate::mistral::tests::unusable(), up(), None);
         assert!(
             matches!(write_summary(&account, &mut slot, SummaryKind::Note, "words"), Err(Fault::Temporary(_))),
             "a partition that cannot be read"

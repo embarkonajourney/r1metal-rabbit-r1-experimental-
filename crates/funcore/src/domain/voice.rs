@@ -2,7 +2,7 @@
 
 use super::cause::Cause;
 use crate::base::time::NANOS_PER_SECOND;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use crate::storage::SaveFault;
 use alloc::collections::VecDeque;
 use alloc::format;
@@ -467,7 +467,7 @@ impl<S, C> Voice<Request<S, C>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::refusal::Refusal;
+    use crate::mistral::refusal::Refusal;
     use alloc::vec;
 
     #[derive(Default)]

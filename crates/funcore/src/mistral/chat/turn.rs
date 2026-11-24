@@ -2,9 +2,9 @@
 
 use super::answer::Answer;
 use super::request::response_create;
-use crate::openai::fault::Fault;
-use crate::openai::models::Thinking;
-use crate::openai::refusal::Refusal;
+use crate::mistral::fault::Fault;
+use crate::mistral::models::Thinking;
+use crate::mistral::refusal::Refusal;
 use alloc::string::String;
 
 pub(super) const PREVIOUS_NOT_FOUND: &str = "previous_response_not_found";
@@ -77,7 +77,7 @@ impl SocketThread {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::openai::output::COMPLETED;
+    use crate::mistral::output::COMPLETED;
     use alloc::vec;
 
     #[test]

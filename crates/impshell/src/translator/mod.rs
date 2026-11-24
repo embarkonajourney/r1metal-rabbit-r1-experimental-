@@ -1,6 +1,6 @@
 use crate::log;
-use crate::openai::live::Interpreter;
-use crate::openai::{self, Account};
+use crate::mistral::live::Interpreter;
+use crate::mistral::{self, Account};
 use crate::sound::{self, Capture, SoundStream};
 use crate::storage::{Data, InDirectory, stem_now};
 use crate::sync::Board;
@@ -14,9 +14,9 @@ use r1_funcore::domain::translator::session::{self, Action, CLOSING_TIMEOUT, GON
 use r1_funcore::domain::translator::state::{Report, State};
 use r1_funcore::domain::voice::Phase;
 use r1_funcore::hw::sound::to_lost_line;
-use r1_funcore::openai::fault::{Ending, Fault};
-use r1_funcore::openai::ledger::SummaryKind;
-use r1_funcore::openai::models::interpreter;
+use r1_funcore::mistral::fault::{Ending, Fault};
+use r1_funcore::mistral::ledger::SummaryKind;
+use r1_funcore::mistral::models::interpreter;
 use r1_funcore::storage::TALKS;
 use std::io;
 use std::ops::ControlFlow;
@@ -270,7 +270,7 @@ fn work(shared: &Shared) -> ! {
         shared.set_phase(round, Phase::Connecting);
         let (ending, paid_seconds) = run_session(shared, round);
         let (seconds, micros) =
-            paid_seconds.map_or((0, 0), |seconds| (seconds, openai::live::book_session(&shared.account, seconds)));
+            paid_seconds.map_or((0, 0), |seconds| (seconds, mistral::live::book_session(&shared.account, seconds)));
         let (turns, has_speech) = {
             let state = shared.board.lock();
             (state.dialogue().turns.clone(), state.dialogue().has_speech())

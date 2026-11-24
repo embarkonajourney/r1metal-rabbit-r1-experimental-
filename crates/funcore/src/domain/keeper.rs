@@ -49,7 +49,7 @@ pub fn to_flash_unkept_line(flash: &Flash, error: &dyn Display) -> String {
 
 /// The log line of a flash's choice stored, `has_key` where it gave a key.
 pub fn to_flash_line(flash: &Flash, settings: &Settings, has_key: bool) -> String {
-    let key_text = if has_key { ", and gave an OpenAI key, whose keeping its stamp waits for" } else { "" };
+    let key_text = if has_key { ", and gave an Mistral key, whose keeping its stamp waits for" } else { "" };
     format!("settings: flash {} chose {}{key_text}, kept", flash.stamp, settings.to_log_line())
 }
 
@@ -65,7 +65,7 @@ pub enum Order {
     FlashKept,
 }
 
-/// What an earlier run stored, and the OpenAI key a flash gave.
+/// What an earlier run stored, and the Mistral key a flash gave.
 pub struct StoredSettings {
     pub settings: Settings,
     pub known: Vec<Entry>,
@@ -243,7 +243,7 @@ mod tests {
         assert_eq!(to_flash_line(&flash, &settings, false), format!("settings: flash 7 chose {told}, kept"));
         assert_eq!(
             to_flash_line(&flash, &settings, true),
-            format!("settings: flash 7 chose {told}, and gave an OpenAI key, whose keeping its stamp waits for, kept")
+            format!("settings: flash 7 chose {told}, and gave an Mistral key, whose keeping its stamp waits for, kept")
         );
     }
 }

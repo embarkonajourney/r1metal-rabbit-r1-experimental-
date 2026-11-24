@@ -4,7 +4,7 @@ use crate::base::handoff::Request;
 use crate::domain::cause::Cause;
 use crate::domain::dialogue::{Dialogue, Turn};
 use crate::domain::voice::Phase;
-use crate::openai::fault::Ending;
+use crate::mistral::fault::Ending;
 use alloc::string::String;
 use alloc::vec::Vec;
 
@@ -111,7 +111,7 @@ mod tests {
         let mut state = State::default();
         state.request.claim(Some(4));
         assert!(state.is_wanted(4) && !state.is_wanted(5));
-        let ending = Ending::Failed(crate::openai::fault::Fault::Temporary("gone".into()));
+        let ending = Ending::Failed(crate::mistral::fault::Fault::Temporary("gone".into()));
         assert_ne!(state.to_phase(4, &ending), state.to_phase(5, &ending));
         assert_eq!(state.to_phase(5, &ending), state.to_phase(5, &Ending::Done));
     }

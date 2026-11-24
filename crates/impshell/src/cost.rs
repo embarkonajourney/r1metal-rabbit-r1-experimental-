@@ -2,7 +2,7 @@ use crate::sync::Fetcher;
 use crate::{clock, log};
 use r1_funcore::base::time::Moment;
 use r1_funcore::domain::cost::{Figure, to_figures};
-use r1_funcore::openai::ledger::Ledger;
+use r1_funcore::mistral::ledger::Ledger;
 use std::io;
 
 fn read_figures(read_ledger: &impl Fn() -> io::Result<Ledger>) -> Vec<Figure> {
@@ -34,7 +34,7 @@ mod tests {
 
     #[test]
     fn unreadable_ledger_gives_unknown() {
-        let account = crate::openai::tests::unusable();
+        let account = crate::mistral::tests::unusable();
         assert_eq!(read_figures(&|| account.ledger()), vec![Figure::unknown()]);
     }
 }

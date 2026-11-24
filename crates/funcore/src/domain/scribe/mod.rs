@@ -9,10 +9,10 @@ use crate::domain::paper::pages::to_pages;
 use crate::domain::paper::sheet::{self, Subject};
 use crate::domain::shelf::Shelf;
 use crate::gfx::palette::Roles;
-use crate::openai::fault::Fault;
-use crate::openai::ledger::SummaryKind;
-use crate::openai::summary::Summary;
-use crate::openai::transcript;
+use crate::mistral::fault::Fault;
+use crate::mistral::ledger::SummaryKind;
+use crate::mistral::summary::Summary;
+use crate::mistral::transcript;
 use crate::storage::Files;
 use crate::storage::paths::Listed;
 use alloc::format;
@@ -259,7 +259,7 @@ mod tests {
 
         fn summarize(&mut self, _: SummaryKind, words: &str) -> Result<Summary, Fault> {
             self.effects.push(format!("summarize {words}"));
-            Ok(Summary { text: "Summed.".into(), usage: crate::openai::tokens::Usage::default() })
+            Ok(Summary { text: "Summed.".into(), usage: crate::mistral::tokens::Usage::default() })
         }
 
         fn to_page_marks(&mut self) -> ((u64, i16), Roles) {

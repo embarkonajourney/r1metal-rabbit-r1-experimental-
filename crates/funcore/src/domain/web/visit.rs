@@ -5,7 +5,7 @@ use super::{Page, Reply, Request, parse, read_document, read_reply, to_input, to
 use crate::base::text::has_words;
 use crate::codec::http::Target;
 use crate::net::fetch::{Fetched, MAX_HOPS};
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

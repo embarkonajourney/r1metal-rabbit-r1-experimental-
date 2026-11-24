@@ -7,7 +7,7 @@ use super::{
     Language, NO_NAMES, entry_body, names_body, to_found_line, to_names_line, to_no_entry_line, to_no_entry_text,
 };
 use crate::gfx::Picture;
-use crate::openai::fault::Fault;
+use crate::mistral::fault::Fault;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;

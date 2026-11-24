@@ -10,7 +10,7 @@ use crate::domain::scene::{self, CHECKING, KEEPING, KeyStep, SCANNING, Scan, Sce
 use crate::domain::uses::Use;
 use crate::gfx::Rect;
 use crate::net::wireguard::config::Flaw;
-use crate::openai::key::{self, CheckResult, Report, SCAN_COMMAND};
+use crate::mistral::key::{self, CheckResult, Report, SCAN_COMMAND};
 use crate::ui::Ui;
 use crate::ui::corner::WIFI_ICON;
 use crate::ui::grid::Grid;
@@ -29,8 +29,8 @@ const DONE_ICON: &str = icon!("check_circle");
 const KEY_ICON: &str = icon!("key");
 const FORGET_ICON: &str = icon!("delete");
 pub(super) const ICONS: [&str; 4] = [SCAN_ICON, DONE_ICON, KEY_ICON, FORGET_ICON];
-const NAME: &str = "OPENAI KEY";
-const SET_KEY: &str = "SET OPENAI API KEY";
+const NAME: &str = "MISTRAL KEY";
+const SET_KEY: &str = "SET MISTRAL API KEY";
 const NONE_YET: &str = "NONE YET";
 const KEPT: &str = "KEPT";
 const KEY_SET: &str = "KEY SET";
@@ -74,7 +74,7 @@ enum Step {
     Done,
 }
 
-// The window that takes by a scanned code what the device keeps: the key to OpenAI's services, or a tunnel's config.
+// The window that takes by a scanned code what the device keeps: the key to Mistral's services, or a tunnel's config.
 pub(crate) struct Keying {
     subject: Scan,
     step: Step,
@@ -122,12 +122,12 @@ impl Keying {
 
 fn write_speech(ui: &Ui, text: &mut String) {
     text.push_str(match (ui.keying.subject, &ui.keying.step) {
-        (Scan::Key, Step::Asking) if ui.is_keyed == Some(true) => "My OpenAI key works.",
-        (Scan::Key, Step::Asking) => "I need an OpenAI key.",
+        (Scan::Key, Step::Asking) if ui.is_keyed == Some(true) => "My Mistral key works.",
+        (Scan::Key, Step::Asking) => "I need an Mistral key.",
         (Scan::Tunnel, Step::Asking) if ui.has_tunnel == Some(true) => "I keep a tunnel's config.",
         (Scan::Tunnel, Step::Asking) => "I keep no tunnel's config.",
         (_, Step::Scanning) => "Show me the code.",
-        (_, Step::Checking(_)) => "I ask OpenAI.",
+        (_, Step::Checking(_)) => "I ask Mistral.",
         (_, Step::Keeping) => "I keep it.",
         (Scan::Key, Step::Done) => "The key works.",
         (Scan::Tunnel, Step::Done) => "The config is kept.",
@@ -135,7 +135,7 @@ fn write_speech(ui: &Ui, text: &mut String) {
 }
 
 impl Ui {
-    /// Whether an OpenAI key is stored.
+    /// Whether an Mistral key is stored.
     pub const fn is_keyed(&self) -> Option<bool> {
         self.is_keyed
     }

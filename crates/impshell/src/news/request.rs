@@ -1,14 +1,14 @@
 use super::gather;
 use crate::log;
-use crate::openai::{Account, write};
+use crate::mistral::{Account, write};
 use crate::storage::Data;
 use crate::timekeeper::read_location;
 use crate::voiced::{ChoreRunner, Part, Shared, Worker};
 use crate::wifi::radio::{Hold, NetworkDown};
 use r1_funcore::domain::news::request::{self, Change, PROMPT, Reading, Step};
 use r1_funcore::domain::voice::{Phase, Query};
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::transcript::Subject;
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::transcript::Subject;
 use std::ffi::CStr;
 use std::io;
 

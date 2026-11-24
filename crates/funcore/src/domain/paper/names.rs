@@ -1,6 +1,6 @@
 //! The file names of entries.
 
-use crate::openai::ledger::SummaryKind;
+use crate::mistral::ledger::SummaryKind;
 use crate::storage::{NEWS, NOTES, TALKS};
 use alloc::format;
 use alloc::string::String;

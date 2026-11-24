@@ -1,12 +1,12 @@
 use crate::log;
-use crate::openai::{self, Account};
+use crate::mistral::{self, Account};
 use crate::sound::Memo;
 use crate::sync::Board;
 use crate::sys;
 use crate::wifi::radio::NetworkDown;
 use r1_funcore::domain::voice::{self, Action, Bid, Hold, Phase, Query, Step, Voice};
-use r1_funcore::openai::fault::Fault;
-use r1_funcore::openai::transcript::{self, Subject};
+use r1_funcore::mistral::fault::Fault;
+use r1_funcore::mistral::transcript::{self, Subject};
 use r1_funcore::storage::SaveFault;
 use std::ffi::CStr;
 use std::io;
@@ -79,7 +79,7 @@ impl<J: Worker> Shared<J> {
             Query::Text(words) => Ok(words),
             Query::Voice { sound, seconds } => {
                 self.set_phase(Phase::Writing);
-                openai::transcript::transcribe(&self.account, down, (&sound, seconds), subject, on_words)
+                mistral::transcript::transcribe(&self.account, down, (&sound, seconds), subject, on_words)
                     .inspect_err(|fault| log!("{unwritten}: {fault}"))
             }
         }
@@ -228,7 +228,7 @@ fn work<J: Worker>(shared: &Shared<J>) -> ! {
 fn take_stay<J: Worker>(shared: &Shared<J>, needs_key: bool) -> Result<J::Stay, Fault> {
     let stay = shared.job.stay(shared, needs_key).inspect_err(|fault| log!("{}: {fault}", J::NAME))?;
     if shared.board.lock().should_connect_ahead() {
-        openai::transcript::prepare(&shared.account, (J::DOWN)(&stay));
+        mistral::transcript::prepare(&shared.account, (J::DOWN)(&stay));
     }
     Ok(stay)
 }
@@ -416,7 +416,7 @@ mod tests {
     fn text_then_recording(is_keyless: bool, count: usize) -> Vec<&'static str> {
         let (events, (gate, receiver)) = (Events::default(), mpsc::channel());
         let part =
-            Part::spawn(Tokens::new(&events, is_keyless, receiver), true, crate::openai::tests::unusable()).unwrap();
+            Part::spawn(Tokens::new(&events, is_keyless, receiver), true, crate::mistral::tests::unusable()).unwrap();
         part.ask(vec![Bid::Text("mew".into())]);
         assert_eq!(wait_events(&events, 1), ["keyless taken"], "a name typed holds the network without the key");
         part.shared.board.lock().begin_recording(true, sys::monotonic_ns());
@@ -447,7 +447,7 @@ mod tests {
     fn refused_stay_asked_once() {
         let (events, (_gate, receiver)) = (Events::default(), mpsc::channel());
         let job = Tokens { is_offline: true, ..Tokens::new(&events, false, receiver) };
-        let part = Part::spawn(job, true, crate::openai::tests::unusable()).unwrap();
+        let part = Part::spawn(job, true, crate::mistral::tests::unusable()).unwrap();
         part.ask(vec![Bid::Text("mew".into())]);
         wait_events(&events, 1);
         while !part.is_off() {
@@ -462,7 +462,7 @@ mod tests {
         let (events, (gate, receiver)) = (Events::default(), mpsc::channel());
         let job = Tokens::new(&events, false, receiver);
         let downs = Arc::clone(&job.downs);
-        let part = Part::spawn(job, true, crate::openai::tests::unusable()).unwrap();
+        let part = Part::spawn(job, true, crate::mistral::tests::unusable()).unwrap();
         part.ask(vec![Bid::Text("mew".into())]);
         assert_eq!(wait_events(&events, 1), ["keyless taken"]);
         part.ask(vec![Bid::Text("mewtwo".into())]);
@@ -484,7 +484,7 @@ mod tests {
         let (events, (_gate, receiver)) = (Events::default(), mpsc::channel());
         let job = Tokens::new(&events, false, receiver);
         let downs = Arc::clone(&job.downs);
-        let part = Part::spawn(job, true, crate::openai::tests::unusable()).unwrap();
+        let part = Part::spawn(job, true, crate::mistral::tests::unusable()).unwrap();
         part.shared.board.lock().begin_recording(true, sys::monotonic_ns());
         part.shared.board.notify();
         assert_eq!(

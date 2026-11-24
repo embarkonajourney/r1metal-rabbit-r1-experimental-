@@ -82,7 +82,7 @@ pub(crate) const CHECKING: &str = "CHECKING";
 pub(crate) const KEEPING: &str = "KEEPING";
 pub(crate) const OPEN: &str = "OPEN";
 
-/// What the window that scans a code takes by it: the key to OpenAI's services, or a tunnel's config.
+/// What the window that scans a code takes by it: the key to Mistral's services, or a tunnel's config.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Scan {
     Key,

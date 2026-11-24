@@ -85,7 +85,7 @@ impl State {
 mod tests {
     use super::*;
     use crate::domain::cause::Cause;
-    use crate::openai::fault::Fault;
+    use crate::mistral::fault::Fault;
 
     fn page(title: &str, bytes: usize) -> Page {
         Page { title: title.into(), text: "x".repeat(bytes), ..Page::default() }

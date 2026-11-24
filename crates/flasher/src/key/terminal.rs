@@ -63,8 +63,8 @@ pub(super) fn room_for(side: usize) -> Result<()> {
 mod tests {
     use super::*;
 
-    // A key as OpenAI's look, made up.
-    const KEY: &str = "sk-proj-Fake0Key_-9abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    // A key as Mistral's look, made up.
+    const KEY: &str = "FakeKey0123456789AbCdEf012345678";
 
     // Each line's characters of a drawn code as the modules their colours draw, dark or not.
     fn characters(drawn: &str) -> Vec<Vec<bool>> {

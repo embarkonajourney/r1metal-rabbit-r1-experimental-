@@ -8,7 +8,7 @@ use alloc::string::String;
 const LONG_CONTEXT_TOKENS: u64 = 272_000;
 const RATE_UNIT: u64 = 1000;
 
-// Millionths of a dollar a thousand tokens, from OpenAI's price pages.
+// Millionths of a dollar a thousand tokens, from Mistral's price pages.
 const fn rates(model: Model, is_long: bool) -> Rates {
     let [plain, cache_read, cache_write, cache_write_12h, output] = match (model, is_long) {
         (Model::Luna, false) => [100, 10, 125, 250, 500],
